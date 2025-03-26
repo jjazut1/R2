@@ -54,6 +54,17 @@
             </ul>
         </nav>
     </header>
+
+    <h2>Login or Sign Up</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="email-signup">Sign Up with Email</button>
+    <button id="email-login">Log In with Email</button>
+    <button id="google-login">Sign In with Google</button>
+    <button id="logout">Log Out</button>
+    
+
+
     <main>
         <h2>Main Content</h2>
         <p>This is where the main content of the webpage will go.</p>
@@ -61,5 +72,95 @@
     <footer>
         <p>&copy; 2023 My Website</p>
     </footer>
+
+
+
+    
 </body>
+<script type="module">
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+  
+    // Firebase configuration (Replace with your Firebase project settings)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGCqsM7CktogM9reSo8k4ubcoc3To0Vwo",
+      authDomain: "verse-11f2d.firebaseapp.com",
+      projectId: "verse-11f2d",
+      storageBucket: "verse-11f2d.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
+  
+    // Google Sign-In Function
+    document.getElementById("google-login").addEventListener("click", async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        await saveUserData(user);
+        alert(`Welcome, ${user.displayName}!`);
+      } catch (error) {
+        console.error(error.message);
+      }
+    });
+  
+    // Email Sign-Up Function
+    document.getElementById("email-signup").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        await saveUserData(user);
+        alert(`Account created for ${user.email}`);
+      } catch (error) {
+        console.error(error.message);
+      }
+    });
+  
+    // Email Sign-In Function
+    document.getElementById("email-login").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        alert(`Welcome back, ${user.email}!`);
+      } catch (error) {
+        console.error(error.message);
+      }
+    });
+  
+    // Logout Function
+    document.getElementById("logout").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        alert("You have been logged out.");
+      } catch (error) {
+        console.error(error.message);
+      }
+    });
+  
+    // Save User Data to Firestore
+    async function saveUserData(user) {
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
+  
+      if (!userDoc.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          name: user.displayName || "No Name",
+          createdAt: new Date(),
+        });
+      }
+    }
+  </script>
+  
 </html>
