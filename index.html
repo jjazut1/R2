@@ -87,20 +87,11 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
   
-    // Firebase configuration (Replace with your Firebase project settings)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDGCqsM7CktogM9reSo8k4ubcoc3To0Vwo",
-      authDomain: "verse-11f2d.firebaseapp.com",
-      projectId: "verse-11f2d",
-      storageBucket: "verse-11f2d.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-  
-    // Initialize Firebase
+    // Fetch Firebase configuration from the server
     fetch('/firebase-config')
       .then(response => response.json())
       .then(config => {
+        // Initialize Firebase with the fetched configuration
         const app = initializeApp(config);
         const auth = getAuth();
         const db = getFirestore();
@@ -209,6 +200,9 @@
                 });
             }
         }
+      })
+      .catch(error => {
+        console.error('Error fetching Firebase configuration:', error);
       });
   </script>
   
