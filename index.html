@@ -68,6 +68,10 @@
     <main>
         <h2>Main Content</h2>
         <p>This is where the main content of the webpage will go.</p>
+        <div id="admin-dashboard" style="display: none;">
+            <h3>Admin Dashboard</h3>
+            <ul id="pending-users"></ul>
+        </div>
     </main>
     <footer>
         <p>&copy; 2023 My Website</p>
@@ -148,18 +152,59 @@
       }
     });
   
-    // Save User Data to Firestore
-    async function saveUserData(user) {
-      const userRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userRef);
-  
-      if (!userDoc.exists()) {
-        await setDoc(userRef, {
-          email: user.email,
-          name: user.displayName || "No Name",
-          createdAt: new Date(),
+    // Check if user is admin (for simplicity, assume admin email is hardcoded)
+    const adminEmail = "admin@example.com";
+
+    // Show admin dashboard if logged in as admin
+    auth.onAuthStateChanged(user => {
+        if (user && user.email === adminEmail) {
+            document.getElementById('admin-dashboard').style.display = 'block';
+            loadPendingUsers();
+        }
+    });
+
+    // Load pending users
+    async function loadPendingUsers() {
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.where('status', '==', 'pending').get();
+        const pendingUsersList = document.getElementById('pending-users');
+        pendingUsersList.innerHTML = '';
+        snapshot.forEach(doc => {
+            const user = doc.data();
+            const li = document.createElement('li');
+            li.textContent = `${user.email} - ${user.name}`;
+            const approveButton = document.createElement('button');
+            approveButton.textContent = 'Approve';
+            approveButton.onclick = () => updateUserStatus(doc.id, 'approved');
+            const disapproveButton = document.createElement('button');
+            disapproveButton.textContent = 'Disapprove';
+            disapproveButton.onclick = () => updateUserStatus(doc.id, 'disapproved');
+            li.appendChild(approveButton);
+            li.appendChild(disapproveButton);
+            pendingUsersList.appendChild(li);
         });
-      }
+    }
+
+    // Update user status
+    async function updateUserStatus(userId, status) {
+        const userRef = db.collection('users').doc(userId);
+        await userRef.update({ status });
+        loadPendingUsers();
+    }
+
+    // Modify saveUserData to include status
+    async function saveUserData(user) {
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+            await setDoc(userRef, {
+                email: user.email,
+                name: user.displayName || "No Name",
+                createdAt: new Date(),
+                status: 'pending' // Set initial status to pending
+            });
+        }
     }
   </script>
   
