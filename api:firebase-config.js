@@ -1,7 +1,7 @@
 // api/firebase-config.js
 export default function handler(req, res) {
     // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+    res.setHeader('Access-Control-Allow-Origin', 'https://r2-git-main-jjazut1s-projects.vercel.app'); // Allow your specific domain
     res.setHeader('Access-Control-Allow-Methods', 'GET'); // Allow only GET requests
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow specific headers
   
