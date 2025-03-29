@@ -4,11 +4,13 @@ let currentPlayer = 1;
 let playedCardsCount = 0;
 
 function startGame() {
-    // Initialize game state
     const cards = [
         'https://jjazut1.github.io/image-hosting/squirrel holding a present.webp',
         'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp',
-        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp'// Add more URLs for other card images
+        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
+        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
+        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
+        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp'
     ];
     shuffle(cards);
 
@@ -35,8 +37,7 @@ function displayCards(playerId, cards) {
     playerDiv.innerHTML = '';
     cards.forEach(card => {
         const cardElement = document.createElement('img');
-        cardElement.src = 'https://jjazut1.github.io/image-hosting/tree.webp';
-        //  gold key.webp'; // Placeholder for facedown card
+        cardElement.src = 'facedown.webp'; // Correct path to the facedown image
         cardElement.dataset.card = card;
         playerDiv.appendChild(cardElement);
     });
