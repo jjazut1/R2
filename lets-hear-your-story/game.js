@@ -1,5 +1,8 @@
 document.getElementById('startGame').addEventListener('click', startGame);
 
+let currentPlayer = 1;
+let playedCardsCount = 0;
+
 function startGame() {
     // Initialize game state
     const cards = [
@@ -40,8 +43,20 @@ function displayCards(playerId, cards) {
 
 function playCard(cardElement) {
     const playedCardsDiv = document.getElementById('playedCards');
-    if (playedCardsDiv.children.length < 6) {
+    if (playedCardsDiv.children.length < 6 && isCurrentPlayerCard(cardElement)) {
         cardElement.src = cardElement.dataset.card; // Flip to show the actual card
         playedCardsDiv.appendChild(cardElement);
+        playedCardsCount++;
+        switchPlayer();
     }
+}
+
+function isCurrentPlayerCard(cardElement) {
+    const playerDiv = cardElement.closest('.player');
+    return (currentPlayer === 1 && playerDiv.id === 'player1') ||
+           (currentPlayer === 2 && playerDiv.id === 'player2');
+}
+
+function switchPlayer() {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
 }
