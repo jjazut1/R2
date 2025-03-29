@@ -14,6 +14,7 @@ function startGame() {
         'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
         'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
         'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
+        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
         'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp'
     ];
     shuffle(cards);
@@ -41,7 +42,7 @@ function displayCards(playerId, cards) {
     playerDiv.innerHTML = '';
     cards.forEach(card => {
         const cardElement = document.createElement('img');
-        cardElement.src = 'https://jjazut1.github.io/image-hosting/tree.webp'; // Correct path to the facedown image
+        cardElement.src = 'facedown.webp'; // Correct path to the facedown image
         cardElement.dataset.card = card;
         playerDiv.appendChild(cardElement);
     });

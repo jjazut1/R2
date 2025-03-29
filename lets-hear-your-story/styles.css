@@ -77,3 +77,15 @@ button:hover {
 .cards img:hover, #playedCards img:hover {
     transform: scale(1.05);
 }
+#startGame {
+    display: block;
+    margin: 20px auto; /* Centers the button horizontally */
+    background-color: #007aff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
