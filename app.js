@@ -4,7 +4,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEm
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
 // Fetch Firebase configuration from the server
-fetch('https://your-vercel-deployment-url.vercel.app/api/firebase-config')
+fetch('https://r2-p064uptex-jjazut1s-projects.vercel/api/firebase-config')
   .then(response => response.json())
   .then(config => {
     const app = initializeApp(config);
