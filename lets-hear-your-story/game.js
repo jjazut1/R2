@@ -2,6 +2,7 @@ document.getElementById('startGame').addEventListener('click', startGame);
 
 function startGame() {
     // Initialize game state
+    //https://jjazut1.github.io/image-hosting/grassv2nbg.png
     const cards = [
         'card1.webp', 'card2.webp', 'card3.webp', // Add more card images
     ];
