@@ -2,9 +2,10 @@ document.getElementById('startGame').addEventListener('click', startGame);
 
 function startGame() {
     // Initialize game state
-    //https://jjazut1.github.io/image-hosting/grassv2nbg.png
     const cards = [
-        'card1.webp', 'card2.webp', 'card3.webp', // Add more card images
+        'https://jjazut1.github.io/image-hosting/squirrel holding a present.webp',
+        'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp',
+        'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp'// Add more URLs for other card images
     ];
     shuffle(cards);
 
@@ -34,6 +35,11 @@ function displayCards(playerId, cards) {
         const cardElement = document.createElement('img');
         cardElement.src = 'path/to/facedown/image.webp'; // Placeholder for facedown card
         cardElement.dataset.card = card;
+        cardElement.addEventListener('click', () => flipCard(cardElement));
         playerDiv.appendChild(cardElement);
     });
+}
+
+function flipCard(cardElement) {
+    cardElement.src = cardElement.dataset.card; // Flip to show the actual card
 }
