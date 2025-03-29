@@ -9,13 +9,26 @@ function startGame() {
     playedCardsDiv.innerHTML = '';
 
     const cards = [
-        'https://jjazut1.github.io/image-hosting/squirrel holding a present.webp',
-        'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp',
-        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
-        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
-        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
-        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp',
-        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp'
+        'https://jjazut1.github.io/story-cards/squirrel holding a present.webp',
+        'https://jjazut1.github.io/story-cards/songbird soaring above castle.webp',
+        'https://jjazut1.github.io/story-cards/raccoon holding a gold key.webp',
+        'https://jjazut1.github.io/story-cards/hippo.webp',
+        'https://jjazut1.github.io/story-cards/penguin.webp',
+        'https://jjazut1.github.io/story-cards/kangaroo.webp',
+        'https://jjazut1.github.io/story-cards/monkey.webp',
+        'https://jjazut1.github.io/story-cards/beaver.webp',
+        'https://jjazut1.github.io/story-cards/cheetah.webp',
+        'https://jjazut1.github.io/story-cards/fox.webp',
+        'https://jjazut1.github.io/story-cards/zebra.webp',
+        'https://jjazut1.github.io/story-cards/giraffe.webp',
+        'https://jjazut1.github.io/story-cards/squirrelskating.webp',
+        'https://jjazut1.github.io/story-cards/turtle.webp',
+        'https://jjazut1.github.io/story-cards/duck.webp',
+        'https://jjazut1.github.io/story-cards/chicken.webp',
+        'https://jjazut1.github.io/story-cards/raccoon.webp',
+        'https://jjazut1.github.io/story-cards/chickenteaching.webp',
+        'https://jjazut1.github.io/story-cards/pig.webp',
+        'https://jjazut1.github.io/story-cards/owl.webp'
     ];
     shuffle(cards);
 
