@@ -4,6 +4,10 @@ let currentPlayer = 1;
 let playedCardsCount = 0;
 
 function startGame() {
+    // Clear played cards
+    const playedCardsDiv = document.getElementById('playedCards');
+    playedCardsDiv.innerHTML = '';
+
     const cards = [
         'https://jjazut1.github.io/image-hosting/squirrel holding a present.webp',
         'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp',
@@ -37,7 +41,7 @@ function displayCards(playerId, cards) {
     playerDiv.innerHTML = '';
     cards.forEach(card => {
         const cardElement = document.createElement('img');
-        cardElement.src = 'facedown.webp'; // Correct path to the facedown image
+        cardElement.src = 'https://jjazut1.github.io/image-hosting/tree.webp',; // Correct path to the facedown image
         cardElement.dataset.card = card;
         playerDiv.appendChild(cardElement);
     });
