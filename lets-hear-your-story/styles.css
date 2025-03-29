@@ -79,8 +79,9 @@ button:hover {
     transform: scale(1.05);
 }
 #startGame {
-    display: block;
-    margin: 20px auto; /* Centers the button horizontally */
+    grid-row: 3;
+    grid-column: 1 / span 2;
+    justify-self: center;
     background-color: #007aff;
     color: #fff;
     border: none;
@@ -89,5 +90,8 @@ button:hover {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.2s;
-    
+}
+
+#startGame:hover {
+    background-color: #005bb5;
 }
