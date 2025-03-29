@@ -42,7 +42,7 @@ function displayCards(playerId, cards) {
     playerDiv.innerHTML = '';
     cards.forEach(card => {
         const cardElement = document.createElement('img');
-        cardElement.src = 'facedown.webp'; // Correct path to the facedown image
+        cardElement.src = 'https://jjazut1.github.io/image-hosting/tree.webp'; // Correct path to the facedown image
         cardElement.dataset.card = card;
         playerDiv.appendChild(cardElement);
     });
