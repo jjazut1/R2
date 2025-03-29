@@ -66,13 +66,14 @@ button:hover {
     background-color: #005bb5;
 }
 .cards img, #playedCards img {
-    width: 15vw; /* 15% of the viewport width */
-    max-width: 150px; /* Maximum width */
+    width: 20vw; /* Increase to 20% of the viewport width */
+    max-width: 200px; /* Increase maximum width */
     height: auto; /* Maintain aspect ratio */
     border-radius: 8px;
     cursor: pointer;
     transition: transform 0.2s;
 }
+
 
 .cards img:hover, #playedCards img:hover {
     transform: scale(1.05);
@@ -88,4 +89,5 @@ button:hover {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.2s;
+    
 }
