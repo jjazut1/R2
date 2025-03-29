@@ -35,7 +35,8 @@ function displayCards(playerId, cards) {
     playerDiv.innerHTML = '';
     cards.forEach(card => {
         const cardElement = document.createElement('img');
-        cardElement.src = 'path/to/facedown/image.webp'; // Placeholder for facedown card
+        cardElement.src = 'https://jjazut1.github.io/image-hosting/tree.webp';
+        //  gold key.webp'; // Placeholder for facedown card
         cardElement.dataset.card = card;
         playerDiv.appendChild(cardElement);
     });
