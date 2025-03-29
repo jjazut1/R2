@@ -5,7 +5,7 @@ function startGame() {
     const cards = [
         'https://jjazut1.github.io/image-hosting/squirrel holding a present.webp',
         'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp',
-        'https://jjazut1.github.io/image-hosting/songbird soaring above castle.webp'// Add more URLs for other card images
+        'https://jjazut1.github.io/image-hosting/raccoon holding a gold key.webp'// Add more URLs for other card images
     ];
     shuffle(cards);
 
