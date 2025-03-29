@@ -34,7 +34,11 @@ fetch('https://r2-roan.vercel.app/api/firebase-config')
         await saveUserData(user);
         alert(`Account created for ${user.email}`);
       } catch (error) {
-        console.error(error.message);
+        if (error.code === 'auth/email-already-in-use') {
+          alert('This email is already in use. Please try logging in instead.');
+        } else {
+          console.error(error.message);
+        }
       }
     });
 
