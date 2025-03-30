@@ -8,56 +8,109 @@ let isDragging = false;
 // Debug check for ghost tracker at start
 console.log('=== INITIALIZATION START ===');
 
-// Create a simple ghost tracker at the very start of the file
-console.log('Creating new ghost tracker...');
+// First, let's create a very simple test
+const testDiv = document.createElement('div');
+testDiv.innerHTML = 'TEST DIV';
+testDiv.style.cssText = `
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    background: red;
+    color: white;
+    padding: 20px;
+    z-index: 99999;
+    font-size: 30px;
+`;
+document.body.appendChild(testDiv);
+
+// Log that we created it
+console.log('Test div created:', testDiv);
+console.log('Test div in DOM:', document.body.contains(testDiv));
+
+// Now let's create the actual ghost tracker with minimal properties
 const ghostTracker = document.createElement('div');
 ghostTracker.style.cssText = `
     position: fixed;
-    background-color: white;
-    color: black;
-    padding: 15px;
+    background: white;
     border: 2px solid black;
-    border-radius: 8px;
+    padding: 10px;
+    z-index: 99999;
     pointer-events: none;
-    z-index: 10000;
-    font-size: 24px;
-    font-family: Arial;
-    transform: translate(-50%, -50%);
-    display: none;
 `;
 document.body.appendChild(ghostTracker);
-console.log('Ghost tracker appended to body');
 
-// Test function to verify ghost tracker
-function testGhostVisibility() {
-    console.log('Testing ghost visibility...');
-    ghostTracker.textContent = 'TEST GHOST';
-    ghostTracker.style.left = '50%';
-    ghostTracker.style.top = '50%';
+// Simplified mouse tracking
+let selectedItem = null;
+
+function updateGhostTracker(x, y, text) {
+    ghostTracker.style.left = x + 'px';
+    ghostTracker.style.top = y + 'px';
+    ghostTracker.textContent = text;
     ghostTracker.style.display = 'block';
-    
-    // Log ghost tracker state
-    console.log('Ghost tracker properties:', {
-        'element': ghostTracker,
-        'inDOM': document.body.contains(ghostTracker),
-        'display': ghostTracker.style.display,
-        'visibility': ghostTracker.style.visibility,
-        'zIndex': ghostTracker.style.zIndex,
-        'text': ghostTracker.textContent
-    });
+    console.log('Updated ghost:', {x, y, text});
 }
 
-// Modified mousemove handler with debugging
-document.addEventListener('mousemove', (event) => {
-    if (selectedItem && isDragging) {
-        console.log('Moving ghost tracker:', {
-            x: event.clientX,
-            y: event.clientY,
-            item: selectedItem
+// Simplified egg click handler
+function createEggs() {
+    const gameBoard = document.getElementById('game-board');
+    gameBoard.innerHTML = '';
+
+    for (let i = 0; i < 10; i++) {
+        const egg = document.createElement('div');
+        egg.className = 'egg';
+        egg.textContent = '?';
+        egg.dataset.cracked = 'false';
+        gameBoard.appendChild(egg);
+
+        egg.addEventListener('click', function(event) {
+            if (this.dataset.cracked === 'false' && !selectedItem) {
+                const isSyllable = Math.random() < 0.5;
+                const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
+                const item = items[Math.floor(Math.random() * items.length)];
+                
+                this.textContent = item;
+                this.classList.add('cracked');
+                this.dataset.cracked = 'true';
+                selectedItem = item;
+                
+                updateGhostTracker(event.clientX, event.clientY, item);
+            } else if (this.dataset.cracked === 'true' && !selectedItem) {
+                selectedItem = this.textContent;
+                updateGhostTracker(event.clientX, event.clientY, this.textContent);
+            }
         });
-        ghostTracker.style.left = `${event.clientX}px`;
-        ghostTracker.style.top = `${event.clientY}px`;
     }
+}
+
+// Simplified mouse move
+document.addEventListener('mousemove', (event) => {
+    if (selectedItem) {
+        updateGhostTracker(event.clientX, event.clientY, selectedItem);
+    }
+});
+
+// Simplified basket handling
+[syllableBasket, nonSyllableBasket].forEach(basket => {
+    basket.addEventListener('click', function() {
+        if (selectedItem) {
+            const isSyllable = ['ran', 'im', 're', 'yes', 'ape', 'he'].includes(selectedItem);
+            if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
+                const currentItems = this.getAttribute('data-items') || '';
+                const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
+                this.setAttribute('data-items', updatedItems);
+                this.querySelector('.items').textContent = updatedItems;
+
+                selectedItem = null;
+                ghostTracker.style.display = 'none';
+            }
+        }
+    });
+});
+
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+    createEggs();
+    console.log('Game initialized');
 });
 
 // Add audio element for egg cracking sound
@@ -174,78 +227,6 @@ function generateCracks(element) {
     element.appendChild(svg);
 }
 
-// Modified egg click handler
-function createEggs() {
-    console.log('Creating eggs...');
-    const gameBoard = document.getElementById('game-board');
-    gameBoard.innerHTML = '';
-
-    for (let i = 0; i < 10; i++) {
-        const egg = document.createElement('div');
-        egg.className = 'egg';
-        egg.textContent = '?';
-        egg.dataset.cracked = 'false';
-        gameBoard.appendChild(egg);
-
-        egg.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default behavior
-            
-            if (this.dataset.cracked === 'false' && !selectedItem) {
-                // Check if we need to reset arrays
-                if (remainingSyllables.length === 0) {
-                    remainingSyllables = [...allSyllables];
-                }
-                if (remainingNonSyllables.length === 0) {
-                    remainingNonSyllables = [...allNonSyllables];
-                }
-
-                const isSyllable = Math.random() < 0.5;
-                const item = isSyllable 
-                    ? getRandomItem(remainingSyllables) 
-                    : getRandomItem(remainingNonSyllables);
-
-                // Generate cracks
-                generateCracks(this);
-
-                // Play cracking sound
-                crackSound.currentTime = 0;
-                crackSound.play();
-                
-                // Flash effect and reveal
-                const originalColor = this.style.backgroundColor;
-                this.style.backgroundColor = '#fff9e6';
-                
-                setTimeout(() => {
-                    this.style.backgroundColor = originalColor;
-                    this.classList.add('cracking');
-
-                    setTimeout(() => {
-                        this.textContent = item;
-                        this.classList.remove('cracking');
-                        this.classList.add('cracked');
-                        this.dataset.cracked = 'true';
-                        selectedItem = item;
-                        isDragging = true;
-                        document.body.classList.add('dragging');
-                        
-                        // Force ghost tracker to appear at click position
-                        requestAnimationFrame(() => {
-                            showGhostTracker(event.clientX, event.clientY, item);
-                        });
-                    }, 500);
-                }, 50);
-            } else if (this.dataset.cracked === 'true' && !selectedItem) {
-                selectedItem = this.textContent;
-                isDragging = true;
-                document.body.classList.add('dragging');
-                requestAnimationFrame(() => {
-                    showGhostTracker(event.clientX, event.clientY, this.textContent);
-                });
-            }
-        });
-    }
-}
-
 // Run test when page loads
 window.addEventListener('DOMContentLoaded', () => {
     console.log('=== PAGE LOADED ===');
@@ -279,41 +260,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Re-add clouds
     addClouds();
     createEggs();
-    testGhostVisibility(); // This will test if the ghost tracker can be shown
     console.log('Game initialization complete');
-
-    // Test ghost tracker visibility
-    console.log('Testing ghost tracker...');
-    showGhostTracker(window.innerWidth / 2, window.innerHeight / 2, 'TEST');
-    setTimeout(() => {
-        ghostTracker.style.display = 'none';
-    }, 2000);
-});
-
-// Update basket click handler to properly hide ghost tracker
-[syllableBasket, nonSyllableBasket].forEach(basket => {
-    basket.addEventListener('click', function() {
-        if (selectedItem) {
-            const isSyllable = allSyllables.includes(selectedItem);
-            if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
-                const currentItems = this.getAttribute('data-items') || '';
-                const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
-                this.setAttribute('data-items', updatedItems);
-                this.querySelector('.items').textContent = updatedItems;
-
-                // Reset selection
-                selectedItem = null;
-                isDragging = false;
-                document.body.classList.remove('dragging');
-                ghostTracker.style.display = 'none';
-            }
-        }
-    });
-});
-
-// Add this to ensure the audio is loaded before trying to use its duration
-crackSound.addEventListener('loadedmetadata', () => {
-    console.log('Audio duration:', crackSound.duration);
 });
 
 // Add clouds to the background
@@ -358,47 +305,3 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('=== INITIALIZATION COMPLETE ===');
-
-// Debug function
-function showGhostTracker(x, y, text) {
-    console.log('Attempting to show ghost tracker:', { x, y, text });
-    
-    // Force the ghost tracker to be visible
-    ghostTracker.style.cssText = `
-        position: fixed;
-        background-color: white;
-        color: black;
-        padding: 15px;
-        border: 2px solid black;
-        border-radius: 8px;
-        pointer-events: none;
-        z-index: 10000;
-        font-size: 24px;
-        font-family: Arial;
-        transform: translate(-50%, -50%);
-        display: block;
-        left: ${x}px;
-        top: ${y}px;
-    `;
-    ghostTracker.textContent = text;
-    
-    // Verify ghost tracker state
-    console.log('Ghost tracker state:', {
-        element: ghostTracker,
-        inDOM: document.body.contains(ghostTracker),
-        display: ghostTracker.style.display,
-        zIndex: ghostTracker.style.zIndex,
-        left: ghostTracker.style.left,
-        top: ghostTracker.style.top,
-        text: ghostTracker.textContent
-    });
-}
-
-// Add cleanup for edge cases
-document.addEventListener('mouseup', () => {
-    if (!selectedItem) {
-        isDragging = false;
-        document.body.classList.remove('dragging');
-        ghostTracker.style.display = 'none';
-    }
-});
