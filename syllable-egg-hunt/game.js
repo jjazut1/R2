@@ -8,26 +8,31 @@ virtualDragPreview.className = 'virtual-drag-preview';
 document.body.appendChild(virtualDragPreview);
 
 egg.addEventListener('click', function() {
-    const isSyllable = Math.random() < 0.5;
-    const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
-    const item = items[Math.floor(Math.random() * items.length)];
-    
-    // Reveal the item without selecting it
-    this.textContent = item;
-    this.classList.add('cracked');
-
-    // Show ghost tracker with the item
-    virtualDragPreview.textContent = item;
-    virtualDragPreview.style.display = 'block';
-
-    // Reset selectedItem
-    selectedItem = null;
-});
-
-// Add a click event to select the item after it has been revealed
-virtualDragPreview.addEventListener('click', function() {
-    if (egg.classList.contains('cracked')) {
+    // Only crack the egg if it's not already cracked
+    if (!this.classList.contains('cracked')) {
+        const isSyllable = Math.random() < 0.5;
+        const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
+        const item = items[Math.floor(Math.random() * items.length)];
+        
+        // Reveal the item without selecting it
+        this.textContent = item;
+        this.classList.add('cracked');
+        
+        // Reset selectedItem to ensure it's not automatically selected
+        selectedItem = null;
+        virtualDragPreview.style.display = 'none';
+    } else {
+        // If the egg is already cracked, clicking on it selects the item
         selectedItem = this.textContent;
+        
+        // Show ghost tracker with the selected item
+        virtualDragPreview.textContent = selectedItem;
+        virtualDragPreview.style.display = 'block';
+        
+        // Position the ghost tracker at the click location
+        const rect = this.getBoundingClientRect();
+        virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+        virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
     }
 });
 
