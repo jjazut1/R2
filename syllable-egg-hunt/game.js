@@ -7,6 +7,12 @@ const virtualDragPreview = document.createElement('div');
 virtualDragPreview.className = 'virtual-drag-preview';
 document.body.appendChild(virtualDragPreview);
 
+// Add audio element for egg cracking sound
+const crackSound = document.createElement('audio');
+crackSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/break.mp3';
+crackSound.id = 'breakSound';
+document.body.appendChild(crackSound);
+
 egg.addEventListener('click', function() {
     // Only crack the egg if it's not already cracked
     if (!this.classList.contains('cracked')) {
@@ -14,13 +20,23 @@ egg.addEventListener('click', function() {
         const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
         const item = items[Math.floor(Math.random() * items.length)];
         
-        // Reveal the item without selecting it
-        this.textContent = item;
-        this.classList.add('cracked');
+        // Play cracking sound
+        crackSound.currentTime = 0;
+        crackSound.play();
         
-        // Reset selectedItem to ensure it's not automatically selected
-        selectedItem = null;
-        virtualDragPreview.style.display = 'none';
+        // Add cracking animation
+        this.classList.add('cracking');
+        
+        // Reveal the item after a short delay
+        setTimeout(() => {
+            this.textContent = item;
+            this.classList.remove('cracking');
+            this.classList.add('cracked');
+            
+            // Reset selectedItem to ensure it's not automatically selected
+            selectedItem = null;
+            virtualDragPreview.style.display = 'none';
+        }, 400); // Animation timing
     } else {
         // If the egg is already cracked, clicking on it selects the item
         selectedItem = this.textContent;
