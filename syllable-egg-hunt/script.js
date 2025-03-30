@@ -35,9 +35,10 @@ egg.addEventListener('click', function() {
         const item = event.dataTransfer.getData('text');
         const isSyllable = ['ran', 'im', 're', 'yes', 'ape', 'he'].includes(item);
         if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
-            const newItem = document.createElement('div');
-            newItem.textContent = item;
-            this.appendChild(newItem);
+            const currentItems = this.getAttribute('data-items') || '';
+            const updatedItems = currentItems ? `${currentItems}, ${item}` : item;
+            this.setAttribute('data-items', updatedItems);
+            this.querySelector('.items').textContent = updatedItems;
 
             // Reset the egg
             egg.textContent = '?';
