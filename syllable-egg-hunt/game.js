@@ -4,15 +4,75 @@ const syllableBasket = document.getElementById('syllable-basket');
 const nonSyllableBasket = document.getElementById('non-syllable-basket');
 let selectedItem = null;
 
-// Add console log when creating ghost tracker
-console.log('Creating ghost tracker...');
+// Debug check for ghost tracker at start
+console.log('=== INITIALIZATION START ===');
+
+// Add style check
+const style = document.createElement('style');
+style.textContent = `
+    .virtual-drag-preview {
+        position: fixed;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-size: 20px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 1000;
+        display: none;
+    }
+`;
+document.head.appendChild(style);
+console.log('Added virtual-drag-preview styles');
+
+// Create ghost tracker with explicit checks
 const virtualDragPreview = document.createElement('div');
 virtualDragPreview.className = 'virtual-drag-preview';
+virtualDragPreview.textContent = 'TEST'; // Add test content
+virtualDragPreview.style.display = 'none';
 virtualDragPreview.style.position = 'fixed';
-virtualDragPreview.style.pointerEvents = 'none';
 virtualDragPreview.style.zIndex = '1000';
 document.body.appendChild(virtualDragPreview);
-console.log('Ghost tracker created:', virtualDragPreview);
+
+console.log('Ghost tracker created with properties:', {
+    'exists': !!virtualDragPreview,
+    'inDOM': document.body.contains(virtualDragPreview),
+    'className': virtualDragPreview.className,
+    'display': virtualDragPreview.style.display,
+    'position': virtualDragPreview.style.position,
+    'zIndex': virtualDragPreview.style.zIndex
+});
+
+// Test visibility
+function testGhostTracker() {
+    console.log('Testing ghost tracker visibility...');
+    virtualDragPreview.style.display = 'block';
+    virtualDragPreview.style.left = '50%';
+    virtualDragPreview.style.top = '50%';
+    console.log('Ghost tracker should now be visible at center');
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        virtualDragPreview.style.display = 'none';
+        console.log('Ghost tracker hidden after test');
+    }, 2000);
+}
+
+// Modified mousemove handler with debugging
+document.addEventListener('mousemove', (event) => {
+    if (selectedItem) {
+        console.log('Mouse move with item:', {
+            'selectedItem': selectedItem,
+            'mouseX': event.clientX,
+            'mouseY': event.clientY,
+            'trackerDisplay': virtualDragPreview.style.display
+        });
+        virtualDragPreview.style.display = 'block';
+        virtualDragPreview.style.left = `${event.clientX}px`;
+        virtualDragPreview.style.top = `${event.clientY}px`;
+    }
+});
 
 // Add audio element for egg cracking sound
 const crackSound = document.createElement('audio');
@@ -128,7 +188,7 @@ function generateCracks(element) {
     element.appendChild(svg);
 }
 
-// Function to create eggs
+// Modified egg click handler
 function createEggs() {
     console.log('Creating eggs...');
     const gameBoard = document.getElementById('game-board');
@@ -142,9 +202,12 @@ function createEggs() {
         gameBoard.appendChild(egg);
 
         egg.addEventListener('click', function() {
-            console.log('Egg clicked, cracked status:', this.dataset.cracked);
-            console.log('Current selectedItem:', selectedItem);
-
+            console.log('Egg clicked:', {
+                'cracked': this.dataset.cracked,
+                'selectedItem': selectedItem,
+                'ghostTrackerVisible': virtualDragPreview.style.display
+            });
+            
             if (this.dataset.cracked === 'false' && !selectedItem) {
                 // Check if we need to reset arrays
                 if (remainingSyllables.length === 0) {
@@ -188,7 +251,11 @@ function createEggs() {
                         console.log('Setting ghost tracker for new item:', item);
                         virtualDragPreview.textContent = item;
                         virtualDragPreview.style.display = 'block';
-                        console.log('Ghost tracker display style:', virtualDragPreview.style.display);
+                        console.log('Ghost tracker updated:', {
+                            'item': item,
+                            'display': virtualDragPreview.style.display,
+                            'text': virtualDragPreview.textContent
+                        });
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
@@ -203,9 +270,9 @@ function createEggs() {
     }
 }
 
-// Initialize eggs when the page loads
+// Run test when page loads
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('Page loaded, initializing game...');
+    console.log('=== PAGE LOADED ===');
     addClouds();
     
     // Create quadrants
@@ -236,16 +303,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Re-add clouds
     addClouds();
     createEggs();
+    testGhostTracker(); // This will test if the ghost tracker can be shown
     console.log('Game initialization complete');
-});
-
-// Add logging to mousemove event
-document.addEventListener('mousemove', (event) => {
-    if (selectedItem) {
-        console.log('Mouse move with selected item:', selectedItem);
-        virtualDragPreview.style.left = `${event.clientX}px`;
-        virtualDragPreview.style.top = `${event.clientY}px`;
-    }
 });
 
 // Update basket click handler to properly hide ghost tracker
@@ -283,21 +342,4 @@ function addClouds() {
     }
 }
 
-// Add CSS for the virtual drag preview
-const style = document.createElement('style');
-style.textContent = `
-    .virtual-drag-preview {
-        position: fixed;
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 2px solid #333;
-        border-radius: 8px;
-        font-size: 20px;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 1000;
-        display: none;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-`;
-document.head.appendChild(style);
+console.log('=== INITIALIZATION COMPLETE ===');
