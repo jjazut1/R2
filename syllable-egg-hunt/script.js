@@ -11,6 +11,7 @@ egg.addEventListener('click', function() {
     // Reveal the item
     this.textContent = item;
     this.setAttribute('draggable', true);
+    this.classList.add('cracked');
 
     // Drag and drop functionality
     this.addEventListener('dragstart', function(event) {
@@ -37,6 +38,11 @@ egg.addEventListener('click', function() {
             const newItem = document.createElement('div');
             newItem.textContent = item;
             this.appendChild(newItem);
+
+            // Reset the egg
+            egg.textContent = '?';
+            egg.removeAttribute('draggable');
+            egg.classList.remove('cracked');
         }
     });
 });
