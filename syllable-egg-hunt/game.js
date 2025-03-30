@@ -3,6 +3,9 @@ const egg = document.getElementById('egg');
 const syllableBasket = document.getElementById('syllable-basket');
 const nonSyllableBasket = document.getElementById('non-syllable-basket');
 let selectedItem = null;
+const virtualDragPreview = document.createElement('div');
+virtualDragPreview.className = 'virtual-drag-preview';
+document.body.appendChild(virtualDragPreview);
 
 egg.addEventListener('click', function() {
     const isSyllable = Math.random() < 0.5;
@@ -13,6 +16,17 @@ egg.addEventListener('click', function() {
     this.textContent = item;
     selectedItem = item;
     this.classList.add('cracked');
+
+    // Show ghost tracker
+    virtualDragPreview.textContent = item;
+    virtualDragPreview.style.display = 'block';
+});
+
+document.addEventListener('mousemove', (event) => {
+    if (selectedItem) {
+        virtualDragPreview.style.left = `${event.clientX}px`;
+        virtualDragPreview.style.top = `${event.clientY}px`;
+    }
 });
 
 [syllableBasket, nonSyllableBasket].forEach(basket => {
@@ -29,6 +43,7 @@ egg.addEventListener('click', function() {
                 egg.textContent = '?';
                 egg.classList.remove('cracked');
                 selectedItem = null;
+                virtualDragPreview.style.display = 'none';
             }
         }
     });
