@@ -19,7 +19,7 @@ ghostTracker.style.cssText = `
     border: 2px solid black;
     border-radius: 8px;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 10000;
     font-size: 24px;
     font-family: Arial;
     transform: translate(-50%, -50%);
@@ -228,15 +228,19 @@ function createEggs() {
                         isDragging = true;
                         document.body.classList.add('dragging');
                         
-                        // Show ghost tracker at click position
-                        showGhostTracker(event.clientX, event.clientY, item);
+                        // Force ghost tracker to appear at click position
+                        requestAnimationFrame(() => {
+                            showGhostTracker(event.clientX, event.clientY, item);
+                        });
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
                 selectedItem = this.textContent;
                 isDragging = true;
                 document.body.classList.add('dragging');
-                showGhostTracker(event.clientX, event.clientY, this.textContent);
+                requestAnimationFrame(() => {
+                    showGhostTracker(event.clientX, event.clientY, this.textContent);
+                });
             }
         });
     }
@@ -277,6 +281,13 @@ window.addEventListener('DOMContentLoaded', () => {
     createEggs();
     testGhostVisibility(); // This will test if the ghost tracker can be shown
     console.log('Game initialization complete');
+
+    // Test ghost tracker visibility
+    console.log('Testing ghost tracker...');
+    showGhostTracker(window.innerWidth / 2, window.innerHeight / 2, 'TEST');
+    setTimeout(() => {
+        ghostTracker.style.display = 'none';
+    }, 2000);
 });
 
 // Update basket click handler to properly hide ghost tracker
@@ -323,6 +334,26 @@ style.textContent = `
     .dragging * {
         cursor: pointer !important;
     }
+
+    #game-container {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+        gap: 20px;
+        pointer-events: none; /* Allow events to pass through container */
+    }
+
+    .left-quadrant, .right-quadrant {
+        pointer-events: auto; /* Re-enable events for quadrant content */
+        position: relative;
+    }
+
+    .virtual-drag-preview {
+        position: fixed !important;
+        z-index: 10000 !important;
+    }
 `;
 document.head.appendChild(style);
 
@@ -330,17 +361,36 @@ console.log('=== INITIALIZATION COMPLETE ===');
 
 // Debug function
 function showGhostTracker(x, y, text) {
-    console.log('Showing ghost tracker:', { x, y, text });
+    console.log('Attempting to show ghost tracker:', { x, y, text });
+    
+    // Force the ghost tracker to be visible
+    ghostTracker.style.cssText = `
+        position: fixed;
+        background-color: white;
+        color: black;
+        padding: 15px;
+        border: 2px solid black;
+        border-radius: 8px;
+        pointer-events: none;
+        z-index: 10000;
+        font-size: 24px;
+        font-family: Arial;
+        transform: translate(-50%, -50%);
+        display: block;
+        left: ${x}px;
+        top: ${y}px;
+    `;
     ghostTracker.textContent = text;
-    ghostTracker.style.left = `${x}px`;
-    ghostTracker.style.top = `${y}px`;
-    ghostTracker.style.display = 'block';
+    
+    // Verify ghost tracker state
     console.log('Ghost tracker state:', {
+        element: ghostTracker,
+        inDOM: document.body.contains(ghostTracker),
         display: ghostTracker.style.display,
+        zIndex: ghostTracker.style.zIndex,
         left: ghostTracker.style.left,
         top: ghostTracker.style.top,
-        text: ghostTracker.textContent,
-        zIndex: ghostTracker.style.zIndex
+        text: ghostTracker.textContent
     });
 }
 
