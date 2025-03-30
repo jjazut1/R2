@@ -107,9 +107,15 @@ egg.addEventListener('click', function() {
         // Generate cracks
         generateCracks(this);
         
-        // Play cracking sound
+        // Play only the first half of the cracking sound
         crackSound.currentTime = 0;
         crackSound.play();
+        
+        // Set a timeout to stop the audio after playing 50% of it
+        setTimeout(() => {
+            crackSound.pause();
+            crackSound.currentTime = 0;
+        }, crackSound.duration * 500 || 500); // 50% of the duration (in ms)
         
         // Flash effect before wobble
         this.style.backgroundColor = '#fff9e6';
@@ -188,4 +194,9 @@ document.addEventListener('click', (event) => {
 
     // Show the ghost tracker at the new location
     ghostTracker.style.display = 'block';
+});
+
+// Add this to ensure the audio is loaded before trying to use its duration
+crackSound.addEventListener('loadedmetadata', () => {
+    console.log('Audio duration:', crackSound.duration);
 });
