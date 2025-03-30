@@ -5,6 +5,9 @@ const nonSyllableBasket = document.getElementById('non-syllable-basket');
 let selectedItem = null;
 const virtualDragPreview = document.createElement('div');
 virtualDragPreview.className = 'virtual-drag-preview';
+virtualDragPreview.style.position = 'fixed';
+virtualDragPreview.style.pointerEvents = 'none';
+virtualDragPreview.style.zIndex = '1000';
 document.body.appendChild(virtualDragPreview);
 
 // Add audio element for egg cracking sound
@@ -124,9 +127,8 @@ function generateCracks(element) {
 // Function to create eggs
 function createEggs() {
     const gameBoard = document.getElementById('game-board');
-    gameBoard.innerHTML = ''; // Clear existing egg
+    gameBoard.innerHTML = '';
 
-    // Create 10 eggs
     for (let i = 0; i < 10; i++) {
         const egg = document.createElement('div');
         egg.className = 'egg';
@@ -134,9 +136,7 @@ function createEggs() {
         egg.dataset.cracked = 'false';
         gameBoard.appendChild(egg);
 
-        // Add click event listener to each egg
         egg.addEventListener('click', function() {
-            // Only crack if egg hasn't been cracked yet
             if (this.dataset.cracked === 'false' && !selectedItem) {
                 // Check if we need to reset arrays
                 if (remainingSyllables.length === 0) {
@@ -177,14 +177,11 @@ function createEggs() {
                         this.dataset.cracked = 'true';
                         selectedItem = item;
                         
-                        // Show ghost tracker with the selected item
+                        // Update ghost tracker
                         virtualDragPreview.textContent = item;
                         virtualDragPreview.style.display = 'block';
-                        
-                        // Position the ghost tracker at the egg's location
-                        const rect = this.getBoundingClientRect();
-                        virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
-                        virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+                        virtualDragPreview.style.left = `${event.clientX}px`;
+                        virtualDragPreview.style.top = `${event.clientY}px`;
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
@@ -192,11 +189,8 @@ function createEggs() {
                 selectedItem = this.textContent;
                 virtualDragPreview.textContent = selectedItem;
                 virtualDragPreview.style.display = 'block';
-                
-                // Position the ghost tracker
-                const rect = this.getBoundingClientRect();
-                virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
-                virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+                virtualDragPreview.style.left = `${event.clientX}px`;
+                virtualDragPreview.style.top = `${event.clientY}px`;
             }
         });
     }
@@ -238,12 +232,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('mousemove', (event) => {
     if (selectedItem) {
+        virtualDragPreview.style.display = 'block';
         virtualDragPreview.style.left = `${event.clientX}px`;
         virtualDragPreview.style.top = `${event.clientY}px`;
     }
 });
 
-// Update basket click handler to not reset eggs
+// Update basket click handler to properly hide ghost tracker
 [syllableBasket, nonSyllableBasket].forEach(basket => {
     basket.addEventListener('click', function() {
         if (selectedItem) {
@@ -254,7 +249,7 @@ document.addEventListener('mousemove', (event) => {
                 this.setAttribute('data-items', updatedItems);
                 this.querySelector('.items').textContent = updatedItems;
 
-                // Reset selection without resetting the egg
+                // Reset selection and hide ghost tracker
                 selectedItem = null;
                 virtualDragPreview.style.display = 'none';
             }
@@ -290,3 +285,22 @@ function addClouds() {
         document.body.appendChild(cloud);
     }
 }
+
+// Add CSS for the virtual drag preview
+const style = document.createElement('style');
+style.textContent = `
+    .virtual-drag-preview {
+        position: fixed;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-size: 20px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+`;
+document.head.appendChild(style);
