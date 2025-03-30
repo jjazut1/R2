@@ -3,6 +3,7 @@ const egg = document.getElementById('egg');
 const syllableBasket = document.getElementById('syllable-basket');
 const nonSyllableBasket = document.getElementById('non-syllable-basket');
 let selectedItem = null;
+let isDragging = false;
 
 // Debug check for ghost tracker at start
 console.log('=== INITIALIZATION START ===');
@@ -21,7 +22,7 @@ ghostTracker.style.cssText = `
     z-index: 9999;
     font-size: 24px;
     font-family: Arial;
-    cursor: pointer;
+    transform: translate(-50%, -50%);
     display: none;
 `;
 document.body.appendChild(ghostTracker);
@@ -48,7 +49,7 @@ function testGhostVisibility() {
 
 // Modified mousemove handler with debugging
 document.addEventListener('mousemove', (event) => {
-    if (selectedItem) {
+    if (selectedItem && isDragging) {
         console.log('Moving ghost tracker:', {
             x: event.clientX,
             y: event.clientY,
@@ -187,11 +188,7 @@ function createEggs() {
         gameBoard.appendChild(egg);
 
         egg.addEventListener('click', function(event) {
-            console.log('Egg clicked:', {
-                'cracked': this.dataset.cracked,
-                'selectedItem': selectedItem,
-                'ghostTrackerVisible': ghostTracker.style.display
-            });
+            event.preventDefault(); // Prevent default behavior
             
             if (this.dataset.cracked === 'false' && !selectedItem) {
                 // Check if we need to reset arrays
@@ -213,14 +210,11 @@ function createEggs() {
                 // Play cracking sound
                 crackSound.currentTime = 0;
                 crackSound.play();
-                setTimeout(() => {
-                    crackSound.pause();
-                    crackSound.currentTime = 0;
-                }, crackSound.duration * 500 || 500);
-
+                
                 // Flash effect and reveal
                 const originalColor = this.style.backgroundColor;
                 this.style.backgroundColor = '#fff9e6';
+                
                 setTimeout(() => {
                     this.style.backgroundColor = originalColor;
                     this.classList.add('cracking');
@@ -231,24 +225,18 @@ function createEggs() {
                         this.classList.add('cracked');
                         this.dataset.cracked = 'true';
                         selectedItem = item;
-                        
-                        // Update ghost tracker at click position
-                        ghostTracker.textContent = item;
-                        ghostTracker.style.display = 'block';
-                        ghostTracker.style.left = `${event.clientX}px`;
-                        ghostTracker.style.top = `${event.clientY}px`;
-                        
-                        // Add dragging class to body to maintain pointer cursor
+                        isDragging = true;
                         document.body.classList.add('dragging');
+                        
+                        // Show ghost tracker at click position
+                        showGhostTracker(event.clientX, event.clientY, item);
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
                 selectedItem = this.textContent;
-                ghostTracker.textContent = selectedItem;
-                ghostTracker.style.display = 'block';
-                ghostTracker.style.left = `${event.clientX}px`;
-                ghostTracker.style.top = `${event.clientY}px`;
+                isDragging = true;
                 document.body.classList.add('dragging');
+                showGhostTracker(event.clientX, event.clientY, this.textContent);
             }
         });
     }
@@ -294,7 +282,6 @@ window.addEventListener('DOMContentLoaded', () => {
 // Update basket click handler to properly hide ghost tracker
 [syllableBasket, nonSyllableBasket].forEach(basket => {
     basket.addEventListener('click', function() {
-        console.log('Basket clicked, selectedItem:', selectedItem);
         if (selectedItem) {
             const isSyllable = allSyllables.includes(selectedItem);
             if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
@@ -303,10 +290,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 this.setAttribute('data-items', updatedItems);
                 this.querySelector('.items').textContent = updatedItems;
 
-                // Reset selection and cursor
+                // Reset selection
                 selectedItem = null;
-                ghostTracker.style.display = 'none';
+                isDragging = false;
                 document.body.classList.remove('dragging');
+                ghostTracker.style.display = 'none';
             }
         }
     });
@@ -339,3 +327,28 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('=== INITIALIZATION COMPLETE ===');
+
+// Debug function
+function showGhostTracker(x, y, text) {
+    console.log('Showing ghost tracker:', { x, y, text });
+    ghostTracker.textContent = text;
+    ghostTracker.style.left = `${x}px`;
+    ghostTracker.style.top = `${y}px`;
+    ghostTracker.style.display = 'block';
+    console.log('Ghost tracker state:', {
+        display: ghostTracker.style.display,
+        left: ghostTracker.style.left,
+        top: ghostTracker.style.top,
+        text: ghostTracker.textContent,
+        zIndex: ghostTracker.style.zIndex
+    });
+}
+
+// Add cleanup for edge cases
+document.addEventListener('mouseup', () => {
+    if (!selectedItem) {
+        isDragging = false;
+        document.body.classList.remove('dragging');
+        ghostTracker.style.display = 'none';
+    }
+});

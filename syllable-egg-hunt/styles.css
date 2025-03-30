@@ -215,7 +215,7 @@ body::after {
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    cursor: pointer;
+    cursor: pointer !important;
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
@@ -235,7 +235,7 @@ body::after {
 
 /* Add disabled state for cracked eggs */
 .egg.cracked {
-    cursor: default;
+    cursor: pointer !important;
     opacity: 0.7;
     background-color: rgba(255, 235, 205, 0.7) !important;
 }
@@ -313,4 +313,9 @@ body::after {
     width: 2px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 1px;
+}
+
+/* Ensure pointer cursor stays throughout the game area */
+#game-board, .basket, .egg, body.dragging * {
+    cursor: pointer !important;
 }
