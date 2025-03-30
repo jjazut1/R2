@@ -3,12 +3,16 @@ const egg = document.getElementById('egg');
 const syllableBasket = document.getElementById('syllable-basket');
 const nonSyllableBasket = document.getElementById('non-syllable-basket');
 let selectedItem = null;
+
+// Add console log when creating ghost tracker
+console.log('Creating ghost tracker...');
 const virtualDragPreview = document.createElement('div');
 virtualDragPreview.className = 'virtual-drag-preview';
 virtualDragPreview.style.position = 'fixed';
 virtualDragPreview.style.pointerEvents = 'none';
 virtualDragPreview.style.zIndex = '1000';
 document.body.appendChild(virtualDragPreview);
+console.log('Ghost tracker created:', virtualDragPreview);
 
 // Add audio element for egg cracking sound
 const crackSound = document.createElement('audio');
@@ -126,6 +130,7 @@ function generateCracks(element) {
 
 // Function to create eggs
 function createEggs() {
+    console.log('Creating eggs...');
     const gameBoard = document.getElementById('game-board');
     gameBoard.innerHTML = '';
 
@@ -137,6 +142,9 @@ function createEggs() {
         gameBoard.appendChild(egg);
 
         egg.addEventListener('click', function() {
+            console.log('Egg clicked, cracked status:', this.dataset.cracked);
+            console.log('Current selectedItem:', selectedItem);
+
             if (this.dataset.cracked === 'false' && !selectedItem) {
                 // Check if we need to reset arrays
                 if (remainingSyllables.length === 0) {
@@ -177,15 +185,19 @@ function createEggs() {
                         selectedItem = item;
                         
                         // Show ghost tracker
+                        console.log('Setting ghost tracker for new item:', item);
                         virtualDragPreview.textContent = item;
                         virtualDragPreview.style.display = 'block';
+                        console.log('Ghost tracker display style:', virtualDragPreview.style.display);
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
                 // Select already revealed item
                 selectedItem = this.textContent;
+                console.log('Selecting revealed item:', selectedItem);
                 virtualDragPreview.textContent = selectedItem;
                 virtualDragPreview.style.display = 'block';
+                console.log('Ghost tracker display style:', virtualDragPreview.style.display);
             }
         });
     }
@@ -193,6 +205,7 @@ function createEggs() {
 
 // Initialize eggs when the page loads
 window.addEventListener('DOMContentLoaded', () => {
+    console.log('Page loaded, initializing game...');
     addClouds();
     
     // Create quadrants
@@ -223,10 +236,13 @@ window.addEventListener('DOMContentLoaded', () => {
     // Re-add clouds
     addClouds();
     createEggs();
+    console.log('Game initialization complete');
 });
 
+// Add logging to mousemove event
 document.addEventListener('mousemove', (event) => {
     if (selectedItem) {
+        console.log('Mouse move with selected item:', selectedItem);
         virtualDragPreview.style.left = `${event.clientX}px`;
         virtualDragPreview.style.top = `${event.clientY}px`;
     }
@@ -235,6 +251,7 @@ document.addEventListener('mousemove', (event) => {
 // Update basket click handler to properly hide ghost tracker
 [syllableBasket, nonSyllableBasket].forEach(basket => {
     basket.addEventListener('click', function() {
+        console.log('Basket clicked, selectedItem:', selectedItem);
         if (selectedItem) {
             const isSyllable = allSyllables.includes(selectedItem);
             if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
@@ -246,6 +263,7 @@ document.addEventListener('mousemove', (event) => {
                 // Reset selection
                 selectedItem = null;
                 virtualDragPreview.style.display = 'none';
+                console.log('Ghost tracker hidden after basket drop');
             }
         }
     });
