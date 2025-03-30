@@ -11,16 +11,19 @@ console.log('=== INITIALIZATION START ===');
 const style = document.createElement('style');
 style.textContent = `
     .virtual-drag-preview {
-        position: fixed;
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 2px solid #333;
-        border-radius: 8px;
-        font-size: 20px;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 1000;
+        position: fixed !important;
+        padding: 10px 15px !important;
+        background-color: white !important;
+        border: 3px solid #000 !important;
+        border-radius: 8px !important;
+        font-size: 24px !important;
+        transform: translate(-50%, -50%) !important;
+        pointer-events: none !important;
+        z-index: 9999 !important;
         display: none;
+        color: black !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        font-family: 'Comic Neue', cursive, sans-serif !important;
     }
 `;
 document.head.appendChild(style);
@@ -29,10 +32,13 @@ console.log('Added virtual-drag-preview styles');
 // Create ghost tracker with explicit checks
 const virtualDragPreview = document.createElement('div');
 virtualDragPreview.className = 'virtual-drag-preview';
-virtualDragPreview.textContent = 'TEST'; // Add test content
-virtualDragPreview.style.display = 'none';
 virtualDragPreview.style.position = 'fixed';
-virtualDragPreview.style.zIndex = '1000';
+virtualDragPreview.style.zIndex = '9999';
+virtualDragPreview.style.backgroundColor = 'white';
+virtualDragPreview.style.border = '3px solid #000';
+virtualDragPreview.style.padding = '10px 15px';
+virtualDragPreview.style.borderRadius = '8px';
+virtualDragPreview.style.transform = 'translate(-50%, -50%)';
 document.body.appendChild(virtualDragPreview);
 
 console.log('Ghost tracker created with properties:', {
