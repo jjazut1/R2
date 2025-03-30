@@ -13,6 +13,30 @@ crackSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/b
 crackSound.id = 'breakSound';
 document.body.appendChild(crackSound);
 
+// Create arrays of syllables and non-syllables
+const allSyllables = ['ran', 'im', 're', 'yes', 'ape', 'he'];
+const allNonSyllables = ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
+
+// Create copies that we'll remove items from as they're used
+let remainingSyllables = [...allSyllables];
+let remainingNonSyllables = [...allNonSyllables];
+
+// Function to get a random item from an array
+function getRandomItem(array) {
+    const randomIndex = Math.floor(Math.random() * array.length);
+    return array.splice(randomIndex, 1)[0]; // Remove and return the item
+}
+
+// Function to check if we need to reset either array
+function resetArraysIfNeeded() {
+    if (remainingSyllables.length === 0) {
+        remainingSyllables = [...allSyllables];
+    }
+    if (remainingNonSyllables.length === 0) {
+        remainingNonSyllables = [...allNonSyllables];
+    }
+}
+
 // Function to generate random cracks
 function generateCracks(element) {
     // Remove any existing cracks
@@ -100,9 +124,16 @@ function generateCracks(element) {
 egg.addEventListener('click', function() {
     // Only crack the egg if it's not already cracked
     if (!this.classList.contains('cracked')) {
+        // Check if we need to reset any of the arrays
+        resetArraysIfNeeded();
+        
+        // Randomly choose between syllable and non-syllable
         const isSyllable = Math.random() < 0.5;
-        const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
-        const item = items[Math.floor(Math.random() * items.length)];
+        
+        // Get a random unused item from the appropriate array
+        const item = isSyllable 
+            ? getRandomItem(remainingSyllables) 
+            : getRandomItem(remainingNonSyllables);
         
         // Generate cracks
         generateCracks(this);
@@ -162,7 +193,7 @@ document.addEventListener('mousemove', (event) => {
 [syllableBasket, nonSyllableBasket].forEach(basket => {
     basket.addEventListener('click', function() {
         if (selectedItem) {
-            const isSyllable = ['ran', 'im', 're', 'yes', 'ape', 'he'].includes(selectedItem);
+            const isSyllable = allSyllables.includes(selectedItem);
             if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
                 const currentItems = this.getAttribute('data-items') || '';
                 const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
@@ -173,8 +204,6 @@ document.addEventListener('mousemove', (event) => {
                 egg.textContent = '?';
                 egg.classList.remove('cracked');
                 selectedItem = null;
-
-                // Hide the ghost tracker after drop
                 virtualDragPreview.style.display = 'none';
             }
         }
