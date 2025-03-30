@@ -146,7 +146,6 @@ function createEggs() {
                     remainingNonSyllables = [...allNonSyllables];
                 }
 
-                // Randomly choose between syllable and non-syllable
                 const isSyllable = Math.random() < 0.5;
                 const item = isSyllable 
                     ? getRandomItem(remainingSyllables) 
@@ -163,7 +162,7 @@ function createEggs() {
                     crackSound.currentTime = 0;
                 }, crackSound.duration * 500 || 500);
 
-                // Flash effect before wobble
+                // Flash effect and reveal
                 const originalColor = this.style.backgroundColor;
                 this.style.backgroundColor = '#fff9e6';
                 setTimeout(() => {
@@ -177,11 +176,9 @@ function createEggs() {
                         this.dataset.cracked = 'true';
                         selectedItem = item;
                         
-                        // Update ghost tracker
+                        // Show ghost tracker
                         virtualDragPreview.textContent = item;
                         virtualDragPreview.style.display = 'block';
-                        virtualDragPreview.style.left = `${event.clientX}px`;
-                        virtualDragPreview.style.top = `${event.clientY}px`;
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
@@ -189,8 +186,6 @@ function createEggs() {
                 selectedItem = this.textContent;
                 virtualDragPreview.textContent = selectedItem;
                 virtualDragPreview.style.display = 'block';
-                virtualDragPreview.style.left = `${event.clientX}px`;
-                virtualDragPreview.style.top = `${event.clientY}px`;
             }
         });
     }
@@ -232,7 +227,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('mousemove', (event) => {
     if (selectedItem) {
-        virtualDragPreview.style.display = 'block';
         virtualDragPreview.style.left = `${event.clientX}px`;
         virtualDragPreview.style.top = `${event.clientY}px`;
     }
@@ -249,27 +243,12 @@ document.addEventListener('mousemove', (event) => {
                 this.setAttribute('data-items', updatedItems);
                 this.querySelector('.items').textContent = updatedItems;
 
-                // Reset selection and hide ghost tracker
+                // Reset selection
                 selectedItem = null;
                 virtualDragPreview.style.display = 'none';
             }
         }
     });
-});
-
-// Assuming `ghostTracker` is your ghost tracker element
-const ghostTracker = document.getElementById('ghostTracker');
-
-document.addEventListener('click', (event) => {
-    // Hide the ghost tracker before moving
-    ghostTracker.style.display = 'none';
-
-    // Update the position of the ghost tracker to the click location
-    ghostTracker.style.left = `${event.clientX}px`;
-    ghostTracker.style.top = `${event.clientY}px`;
-
-    // Show the ghost tracker at the new location
-    ghostTracker.style.display = 'block';
 });
 
 // Add this to ensure the audio is loaded before trying to use its duration
