@@ -125,10 +125,9 @@ egg.addEventListener('click', function() {
                 this.classList.remove('cracking');
                 this.classList.add('cracked');
                 
-                // Reset selectedItem and hide both trackers
+                // Reset selectedItem to ensure it's not automatically selected
                 selectedItem = null;
                 virtualDragPreview.style.display = 'none';
-                ghostTracker.style.display = 'none';
             }, 500); // Match animation duration
             
         }, 50); // Short delay for flash effect
@@ -136,12 +135,14 @@ egg.addEventListener('click', function() {
         // If the egg is already cracked, clicking on it selects the item
         selectedItem = this.textContent;
         
-        // Show virtual drag preview with the selected item
+        // Show ghost tracker with the selected item
         virtualDragPreview.textContent = selectedItem;
         virtualDragPreview.style.display = 'block';
         
-        // Hide ghost tracker when selecting item
-        ghostTracker.style.display = 'none';
+        // Position the ghost tracker at the click location
+        const rect = this.getBoundingClientRect();
+        virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+        virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
     }
 });
 
@@ -178,16 +179,13 @@ document.addEventListener('mousemove', (event) => {
 const ghostTracker = document.getElementById('ghostTracker');
 
 document.addEventListener('click', (event) => {
-    // Only show ghost tracker if no item is selected
-    if (!selectedItem) {
-        // Hide the ghost tracker before moving
-        ghostTracker.style.display = 'none';
-        
-        // Update the position of the ghost tracker to the click location
-        ghostTracker.style.left = `${event.clientX}px`;
-        ghostTracker.style.top = `${event.clientY}px`;
-        
-        // Show the ghost tracker at the new location
-        ghostTracker.style.display = 'block';
-    }
+    // Hide the ghost tracker before moving
+    ghostTracker.style.display = 'none';
+
+    // Update the position of the ghost tracker to the click location
+    ghostTracker.style.left = `${event.clientX}px`;
+    ghostTracker.style.top = `${event.clientY}px`;
+
+    // Show the ghost tracker at the new location
+    ghostTracker.style.display = 'block';
 });
