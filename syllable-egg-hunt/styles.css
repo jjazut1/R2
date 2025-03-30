@@ -105,24 +105,49 @@ body::after {
     animation-delay: 30s;
 }
 
-/* Container for game elements, to ensure they're positioned correctly over the background */
+/* Add quadrant layout */
 #game-container {
     position: relative;
     z-index: 1;
-    padding-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Split into two equal columns */
+    min-height: 100vh;
+    gap: 20px;
 }
 
-/* Adjust layout for better display over the background */
+/* Left quadrant containing game elements */
+.left-quadrant {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Right quadrant (currently empty but ready for future content) */
+.right-quadrant {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Adjust game board layout */
 #game-board {
     display: flex;
     justify-content: center;
-    margin-top: 10vh;
+    margin-bottom: 50px; /* Space between egg and baskets */
+    width: 100%;
 }
 
+/* Adjust baskets layout */
 #baskets {
     display: flex;
-    justify-content: center;
-    margin-top: 15vh;
+    flex-direction: column; /* Stack baskets vertically */
+    gap: 20px; /* Space between baskets */
+    width: 100%;
+    max-width: 300px; /* Control basket width */
 }
 
 .basket {
@@ -130,10 +155,13 @@ body::after {
     border: 2px solid #654321;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    width: 100%;
 }
 
 .egg {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    margin: 0 auto; /* Center the egg */
 }
 
 .egg {
@@ -214,4 +242,16 @@ body::after {
 .cracked {
     background-color: rgba(255, 235, 205, 0.8);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add a subtle divider between quadrants */
+.left-quadrant::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 10%;
+    height: 80%;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 1px;
 }

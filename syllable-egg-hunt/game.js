@@ -239,23 +239,35 @@ function addClouds() {
     }
 }
 
-// Call this function when the page loads
+// Restructure the DOM when the page loads
 window.addEventListener('DOMContentLoaded', () => {
     addClouds();
     
-    // Wrap the existing content in a container for proper z-index
-    const gameElements = Array.from(document.body.children).filter(
-        el => !el.classList.contains('cloud') && el.tagName !== 'SCRIPT'
-    );
-    
+    // Create quadrants
     const container = document.createElement('div');
     container.id = 'game-container';
     
-    gameElements.forEach(el => {
-        if (el !== container) {
-            container.appendChild(el);
-        }
-    });
+    const leftQuadrant = document.createElement('div');
+    leftQuadrant.className = 'left-quadrant';
     
+    const rightQuadrant = document.createElement('div');
+    rightQuadrant.className = 'right-quadrant';
+    
+    // Move existing game elements to left quadrant
+    const gameBoard = document.getElementById('game-board');
+    const baskets = document.getElementById('baskets');
+    
+    if (gameBoard) leftQuadrant.appendChild(gameBoard);
+    if (baskets) leftQuadrant.appendChild(baskets);
+    
+    // Add quadrants to container
+    container.appendChild(leftQuadrant);
+    container.appendChild(rightQuadrant);
+    
+    // Replace existing content with new structure
+    document.body.innerHTML = '';
     document.body.appendChild(container);
+    
+    // Re-add clouds
+    addClouds();
 });
