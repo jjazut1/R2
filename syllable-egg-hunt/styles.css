@@ -1,6 +1,8 @@
 /* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Comic Neue', cursive;
     background-color: #e0f7fa;
     text-align: center;
 }
@@ -58,7 +60,13 @@ body {
     border: 2px solid #000;
     margin: 0 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
     font-size: 18px;
+}
+
+.title {
+    font-weight: bold;
+    margin-bottom: 10px;
 }
