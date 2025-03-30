@@ -1,4 +1,4 @@
-// script.js
+// game.js
 const egg = document.getElementById('egg');
 const syllableBasket = document.getElementById('syllable-basket');
 const nonSyllableBasket = document.getElementById('non-syllable-basket');
