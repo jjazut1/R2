@@ -12,14 +12,23 @@ egg.addEventListener('click', function() {
     const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
     const item = items[Math.floor(Math.random() * items.length)];
     
-    // Reveal the item
+    // Reveal the item without selecting it
     this.textContent = item;
-    selectedItem = item;
     this.classList.add('cracked');
 
-    // Show ghost tracker
+    // Show ghost tracker with the item
     virtualDragPreview.textContent = item;
     virtualDragPreview.style.display = 'block';
+
+    // Reset selectedItem
+    selectedItem = null;
+});
+
+// Add a click event to select the item after it has been revealed
+virtualDragPreview.addEventListener('click', function() {
+    if (egg.classList.contains('cracked')) {
+        selectedItem = this.textContent;
+    }
 });
 
 document.addEventListener('mousemove', (event) => {
