@@ -121,66 +121,119 @@ function generateCracks(element) {
     element.appendChild(svg);
 }
 
-egg.addEventListener('click', function() {
-    // Only crack the egg if it's not already cracked
-    if (!this.classList.contains('cracked')) {
-        // Check if we need to reset any of the arrays
-        resetArraysIfNeeded();
-        
-        // Randomly choose between syllable and non-syllable
-        const isSyllable = Math.random() < 0.5;
-        
-        // Get a random unused item from the appropriate array
-        const item = isSyllable 
-            ? getRandomItem(remainingSyllables) 
-            : getRandomItem(remainingNonSyllables);
-        
-        // Generate cracks
-        generateCracks(this);
-        
-        // Play only the first half of the cracking sound
-        crackSound.currentTime = 0;
-        crackSound.play();
-        
-        // Set a timeout to stop the audio after playing 50% of it
-        setTimeout(() => {
-            crackSound.pause();
-            crackSound.currentTime = 0;
-        }, crackSound.duration * 500 || 500); // 50% of the duration (in ms)
-        
-        // Flash effect before wobble
-        this.style.backgroundColor = '#fff9e6';
-        setTimeout(() => {
-            this.style.backgroundColor = '#ffebcd';
-            
-            // Add cracking animation
-            this.classList.add('cracking');
-            
-            // Reveal the item after animation completes
-            setTimeout(() => {
-                this.textContent = item;
-                this.classList.remove('cracking');
-                this.classList.add('cracked');
+// Function to create eggs
+function createEggs() {
+    const gameBoard = document.getElementById('game-board');
+    gameBoard.innerHTML = ''; // Clear existing egg
+
+    // Create 10 eggs
+    for (let i = 0; i < 10; i++) {
+        const egg = document.createElement('div');
+        egg.className = 'egg';
+        egg.textContent = '?';
+        egg.dataset.cracked = 'false';
+        gameBoard.appendChild(egg);
+
+        // Add click event listener to each egg
+        egg.addEventListener('click', function() {
+            // Only crack if egg hasn't been cracked yet
+            if (this.dataset.cracked === 'false' && !selectedItem) {
+                // Check if we need to reset arrays
+                if (remainingSyllables.length === 0) {
+                    remainingSyllables = [...allSyllables];
+                }
+                if (remainingNonSyllables.length === 0) {
+                    remainingNonSyllables = [...allNonSyllables];
+                }
+
+                // Randomly choose between syllable and non-syllable
+                const isSyllable = Math.random() < 0.5;
+                const item = isSyllable 
+                    ? getRandomItem(remainingSyllables) 
+                    : getRandomItem(remainingNonSyllables);
+
+                // Generate cracks
+                generateCracks(this);
+
+                // Play cracking sound
+                crackSound.currentTime = 0;
+                crackSound.play();
+                setTimeout(() => {
+                    crackSound.pause();
+                    crackSound.currentTime = 0;
+                }, crackSound.duration * 500 || 500);
+
+                // Flash effect before wobble
+                const originalColor = this.style.backgroundColor;
+                this.style.backgroundColor = '#fff9e6';
+                setTimeout(() => {
+                    this.style.backgroundColor = originalColor;
+                    this.classList.add('cracking');
+
+                    setTimeout(() => {
+                        this.textContent = item;
+                        this.classList.remove('cracking');
+                        this.classList.add('cracked');
+                        this.dataset.cracked = 'true';
+                        selectedItem = item;
+                        
+                        // Show ghost tracker with the selected item
+                        virtualDragPreview.textContent = item;
+                        virtualDragPreview.style.display = 'block';
+                        
+                        // Position the ghost tracker at the egg's location
+                        const rect = this.getBoundingClientRect();
+                        virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+                        virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+                    }, 500);
+                }, 50);
+            } else if (this.dataset.cracked === 'true' && !selectedItem) {
+                // Select already revealed item
+                selectedItem = this.textContent;
+                virtualDragPreview.textContent = selectedItem;
+                virtualDragPreview.style.display = 'block';
                 
-                // Reset selectedItem to ensure it's not automatically selected
-                selectedItem = null;
-                virtualDragPreview.style.display = 'none';
-            }, 500); // Match animation duration
-            
-        }, 50); // Short delay for flash effect
-    } else {
-        // If the egg is already cracked, clicking on it selects the item
-        selectedItem = this.textContent;
-        
-        // Show ghost tracker with the selected item
-        virtualDragPreview.textContent = selectedItem;
-        virtualDragPreview.style.display = 'block';
-        
-        // Position the ghost tracker at the click location
-        const rect = this.getBoundingClientRect();
-        virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
-        virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+                // Position the ghost tracker
+                const rect = this.getBoundingClientRect();
+                virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+                virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+            }
+        });
     }
+}
+
+// Initialize eggs when the page loads
+window.addEventListener('DOMContentLoaded', () => {
+    addClouds();
+    
+    // Create quadrants
+    const container = document.createElement('div');
+    container.id = 'game-container';
+    
+    const leftQuadrant = document.createElement('div');
+    leftQuadrant.className = 'left-quadrant';
+    
+    const rightQuadrant = document.createElement('div');
+    rightQuadrant.className = 'right-quadrant';
+    
+    // Move existing game elements to left quadrant
+    const gameBoard = document.getElementById('game-board');
+    const baskets = document.getElementById('baskets');
+    
+    if (gameBoard) leftQuadrant.appendChild(gameBoard);
+    if (baskets) leftQuadrant.appendChild(baskets);
+    
+    // Add quadrants to container
+    container.appendChild(leftQuadrant);
+    container.appendChild(rightQuadrant);
+    
+    // Replace existing content with new structure
+    document.body.innerHTML = '';
+    document.body.appendChild(container);
+    
+    // Re-add clouds
+    addClouds();
+    createEggs();
 });
 
 document.addEventListener('mousemove', (event) => {
@@ -190,6 +243,7 @@ document.addEventListener('mousemove', (event) => {
     }
 });
 
+// Update basket click handler to not reset eggs
 [syllableBasket, nonSyllableBasket].forEach(basket => {
     basket.addEventListener('click', function() {
         if (selectedItem) {
@@ -200,9 +254,7 @@ document.addEventListener('mousemove', (event) => {
                 this.setAttribute('data-items', updatedItems);
                 this.querySelector('.items').textContent = updatedItems;
 
-                // Reset the egg
-                egg.textContent = '?';
-                egg.classList.remove('cracked');
+                // Reset selection without resetting the egg
                 selectedItem = null;
                 virtualDragPreview.style.display = 'none';
             }
@@ -238,36 +290,3 @@ function addClouds() {
         document.body.appendChild(cloud);
     }
 }
-
-// Restructure the DOM when the page loads
-window.addEventListener('DOMContentLoaded', () => {
-    addClouds();
-    
-    // Create quadrants
-    const container = document.createElement('div');
-    container.id = 'game-container';
-    
-    const leftQuadrant = document.createElement('div');
-    leftQuadrant.className = 'left-quadrant';
-    
-    const rightQuadrant = document.createElement('div');
-    rightQuadrant.className = 'right-quadrant';
-    
-    // Move existing game elements to left quadrant
-    const gameBoard = document.getElementById('game-board');
-    const baskets = document.getElementById('baskets');
-    
-    if (gameBoard) leftQuadrant.appendChild(gameBoard);
-    if (baskets) leftQuadrant.appendChild(baskets);
-    
-    // Add quadrants to container
-    container.appendChild(leftQuadrant);
-    container.appendChild(rightQuadrant);
-    
-    // Replace existing content with new structure
-    document.body.innerHTML = '';
-    document.body.appendChild(container);
-    
-    // Re-add clouds
-    addClouds();
-});
