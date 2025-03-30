@@ -1,0 +1,36 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    text-align: center;
+}
+
+#game-board {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.egg {
+    width: 100px;
+    height: 100px;
+    background-color: #ffebcd;
+    border-radius: 50%;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+}
+
+#basket {
+    margin-top: 50px;
+}
+
+#collected-items {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
