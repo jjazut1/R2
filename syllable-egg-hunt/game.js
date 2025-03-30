@@ -12,14 +12,17 @@ console.log('Creating new ghost tracker...');
 const ghostTracker = document.createElement('div');
 ghostTracker.style.cssText = `
     position: fixed;
-    background-color: red;
-    color: white;
-    padding: 20px;
+    background-color: white;
+    color: black;
+    padding: 15px;
+    border: 2px solid black;
     border-radius: 8px;
     pointer-events: none;
     z-index: 9999;
     font-size: 24px;
     font-family: Arial;
+    cursor: pointer;
+    display: none;
 `;
 document.body.appendChild(ghostTracker);
 console.log('Ghost tracker appended to body');
@@ -46,11 +49,10 @@ function testGhostVisibility() {
 // Modified mousemove handler with debugging
 document.addEventListener('mousemove', (event) => {
     if (selectedItem) {
-        console.log('Mouse move with item:', {
-            'selectedItem': selectedItem,
-            'mouseX': event.clientX,
-            'mouseY': event.clientY,
-            'trackerDisplay': ghostTracker.style.display
+        console.log('Moving ghost tracker:', {
+            x: event.clientX,
+            y: event.clientY,
+            item: selectedItem
         });
         ghostTracker.style.left = `${event.clientX}px`;
         ghostTracker.style.top = `${event.clientY}px`;
@@ -184,7 +186,7 @@ function createEggs() {
         egg.dataset.cracked = 'false';
         gameBoard.appendChild(egg);
 
-        egg.addEventListener('click', function() {
+        egg.addEventListener('click', function(event) {
             console.log('Egg clicked:', {
                 'cracked': this.dataset.cracked,
                 'selectedItem': selectedItem,
@@ -230,22 +232,23 @@ function createEggs() {
                         this.dataset.cracked = 'true';
                         selectedItem = item;
                         
-                        // Update ghost tracker
+                        // Update ghost tracker at click position
                         ghostTracker.textContent = item;
                         ghostTracker.style.display = 'block';
-                        console.log('Updated ghost tracker:', {
-                            'visible': ghostTracker.style.display,
-                            'text': ghostTracker.textContent
-                        });
+                        ghostTracker.style.left = `${event.clientX}px`;
+                        ghostTracker.style.top = `${event.clientY}px`;
+                        
+                        // Add dragging class to body to maintain pointer cursor
+                        document.body.classList.add('dragging');
                     }, 500);
                 }, 50);
             } else if (this.dataset.cracked === 'true' && !selectedItem) {
-                // Select already revealed item
                 selectedItem = this.textContent;
-                console.log('Selecting revealed item:', selectedItem);
                 ghostTracker.textContent = selectedItem;
                 ghostTracker.style.display = 'block';
-                console.log('Ghost tracker display style:', ghostTracker.style.display);
+                ghostTracker.style.left = `${event.clientX}px`;
+                ghostTracker.style.top = `${event.clientY}px`;
+                document.body.classList.add('dragging');
             }
         });
     }
@@ -300,10 +303,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 this.setAttribute('data-items', updatedItems);
                 this.querySelector('.items').textContent = updatedItems;
 
-                // Reset selection
+                // Reset selection and cursor
                 selectedItem = null;
                 ghostTracker.style.display = 'none';
-                console.log('Ghost tracker hidden after basket drop');
+                document.body.classList.remove('dragging');
             }
         }
     });
@@ -322,5 +325,17 @@ function addClouds() {
         document.body.appendChild(cloud);
     }
 }
+
+// Add CSS for dragging state
+const style = document.createElement('style');
+style.textContent = `
+    .dragging {
+        cursor: pointer !important;
+    }
+    .dragging * {
+        cursor: pointer !important;
+    }
+`;
+document.head.appendChild(style);
 
 console.log('=== INITIALIZATION COMPLETE ===');
