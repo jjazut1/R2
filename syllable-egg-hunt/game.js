@@ -48,3 +48,12 @@ document.addEventListener('mousemove', (event) => {
         }
     });
 });
+
+// Assuming `ghostTracker` is your ghost tracker element
+const ghostTracker = document.getElementById('ghostTracker');
+
+document.addEventListener('click', (event) => {
+    // Update the position of the ghost tracker to the click location
+    ghostTracker.style.left = `${event.clientX}px`;
+    ghostTracker.style.top = `${event.clientY}px`;
+});
