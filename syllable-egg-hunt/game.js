@@ -229,3 +229,33 @@ document.addEventListener('click', (event) => {
 crackSound.addEventListener('loadedmetadata', () => {
     console.log('Audio duration:', crackSound.duration);
 });
+
+// Add clouds to the background
+function addClouds() {
+    for (let i = 0; i < 3; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        document.body.appendChild(cloud);
+    }
+}
+
+// Call this function when the page loads
+window.addEventListener('DOMContentLoaded', () => {
+    addClouds();
+    
+    // Wrap the existing content in a container for proper z-index
+    const gameElements = Array.from(document.body.children).filter(
+        el => !el.classList.contains('cloud') && el.tagName !== 'SCRIPT'
+    );
+    
+    const container = document.createElement('div');
+    container.id = 'game-container';
+    
+    gameElements.forEach(el => {
+        if (el !== container) {
+            container.appendChild(el);
+        }
+    });
+    
+    document.body.appendChild(container);
+});
