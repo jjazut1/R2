@@ -7,62 +7,40 @@ let selectedItem = null;
 // Debug check for ghost tracker at start
 console.log('=== INITIALIZATION START ===');
 
-// Add style check
-const style = document.createElement('style');
-style.textContent = `
-    .virtual-drag-preview {
-        position: fixed !important;
-        padding: 10px 15px !important;
-        background-color: white !important;
-        border: 3px solid #000 !important;
-        border-radius: 8px !important;
-        font-size: 24px !important;
-        transform: translate(-50%, -50%) !important;
-        pointer-events: none !important;
-        z-index: 9999 !important;
-        display: none;
-        color: black !important;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
-        font-family: 'Comic Neue', cursive, sans-serif !important;
-    }
+// Create a simple ghost tracker at the very start of the file
+console.log('Creating new ghost tracker...');
+const ghostTracker = document.createElement('div');
+ghostTracker.style.cssText = `
+    position: fixed;
+    background-color: red;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 9999;
+    font-size: 24px;
+    font-family: Arial;
 `;
-document.head.appendChild(style);
-console.log('Added virtual-drag-preview styles');
+document.body.appendChild(ghostTracker);
+console.log('Ghost tracker appended to body');
 
-// Create ghost tracker with explicit checks
-const virtualDragPreview = document.createElement('div');
-virtualDragPreview.className = 'virtual-drag-preview';
-virtualDragPreview.style.position = 'fixed';
-virtualDragPreview.style.zIndex = '9999';
-virtualDragPreview.style.backgroundColor = 'white';
-virtualDragPreview.style.border = '3px solid #000';
-virtualDragPreview.style.padding = '10px 15px';
-virtualDragPreview.style.borderRadius = '8px';
-virtualDragPreview.style.transform = 'translate(-50%, -50%)';
-document.body.appendChild(virtualDragPreview);
-
-console.log('Ghost tracker created with properties:', {
-    'exists': !!virtualDragPreview,
-    'inDOM': document.body.contains(virtualDragPreview),
-    'className': virtualDragPreview.className,
-    'display': virtualDragPreview.style.display,
-    'position': virtualDragPreview.style.position,
-    'zIndex': virtualDragPreview.style.zIndex
-});
-
-// Test visibility
-function testGhostTracker() {
-    console.log('Testing ghost tracker visibility...');
-    virtualDragPreview.style.display = 'block';
-    virtualDragPreview.style.left = '50%';
-    virtualDragPreview.style.top = '50%';
-    console.log('Ghost tracker should now be visible at center');
+// Test function to verify ghost tracker
+function testGhostVisibility() {
+    console.log('Testing ghost visibility...');
+    ghostTracker.textContent = 'TEST GHOST';
+    ghostTracker.style.left = '50%';
+    ghostTracker.style.top = '50%';
+    ghostTracker.style.display = 'block';
     
-    // Hide after 2 seconds
-    setTimeout(() => {
-        virtualDragPreview.style.display = 'none';
-        console.log('Ghost tracker hidden after test');
-    }, 2000);
+    // Log ghost tracker state
+    console.log('Ghost tracker properties:', {
+        'element': ghostTracker,
+        'inDOM': document.body.contains(ghostTracker),
+        'display': ghostTracker.style.display,
+        'visibility': ghostTracker.style.visibility,
+        'zIndex': ghostTracker.style.zIndex,
+        'text': ghostTracker.textContent
+    });
 }
 
 // Modified mousemove handler with debugging
@@ -72,11 +50,10 @@ document.addEventListener('mousemove', (event) => {
             'selectedItem': selectedItem,
             'mouseX': event.clientX,
             'mouseY': event.clientY,
-            'trackerDisplay': virtualDragPreview.style.display
+            'trackerDisplay': ghostTracker.style.display
         });
-        virtualDragPreview.style.display = 'block';
-        virtualDragPreview.style.left = `${event.clientX}px`;
-        virtualDragPreview.style.top = `${event.clientY}px`;
+        ghostTracker.style.left = `${event.clientX}px`;
+        ghostTracker.style.top = `${event.clientY}px`;
     }
 });
 
@@ -211,7 +188,7 @@ function createEggs() {
             console.log('Egg clicked:', {
                 'cracked': this.dataset.cracked,
                 'selectedItem': selectedItem,
-                'ghostTrackerVisible': virtualDragPreview.style.display
+                'ghostTrackerVisible': ghostTracker.style.display
             });
             
             if (this.dataset.cracked === 'false' && !selectedItem) {
@@ -253,14 +230,12 @@ function createEggs() {
                         this.dataset.cracked = 'true';
                         selectedItem = item;
                         
-                        // Show ghost tracker
-                        console.log('Setting ghost tracker for new item:', item);
-                        virtualDragPreview.textContent = item;
-                        virtualDragPreview.style.display = 'block';
-                        console.log('Ghost tracker updated:', {
-                            'item': item,
-                            'display': virtualDragPreview.style.display,
-                            'text': virtualDragPreview.textContent
+                        // Update ghost tracker
+                        ghostTracker.textContent = item;
+                        ghostTracker.style.display = 'block';
+                        console.log('Updated ghost tracker:', {
+                            'visible': ghostTracker.style.display,
+                            'text': ghostTracker.textContent
                         });
                     }, 500);
                 }, 50);
@@ -268,9 +243,9 @@ function createEggs() {
                 // Select already revealed item
                 selectedItem = this.textContent;
                 console.log('Selecting revealed item:', selectedItem);
-                virtualDragPreview.textContent = selectedItem;
-                virtualDragPreview.style.display = 'block';
-                console.log('Ghost tracker display style:', virtualDragPreview.style.display);
+                ghostTracker.textContent = selectedItem;
+                ghostTracker.style.display = 'block';
+                console.log('Ghost tracker display style:', ghostTracker.style.display);
             }
         });
     }
@@ -309,7 +284,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Re-add clouds
     addClouds();
     createEggs();
-    testGhostTracker(); // This will test if the ghost tracker can be shown
+    testGhostVisibility(); // This will test if the ghost tracker can be shown
     console.log('Game initialization complete');
 });
 
@@ -327,7 +302,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 // Reset selection
                 selectedItem = null;
-                virtualDragPreview.style.display = 'none';
+                ghostTracker.style.display = 'none';
                 console.log('Ghost tracker hidden after basket drop');
             }
         }
