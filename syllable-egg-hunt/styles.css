@@ -64,39 +64,65 @@ body {
     display: none;
 }
 
-/* Egg crack animation */
-@keyframes crack {
-    0% {
-        transform: rotate(0deg);
-    }
-    10% {
-        transform: rotate(-2deg);
-    }
-    20% {
-        transform: rotate(2deg);
-    }
-    30% {
-        transform: rotate(-2deg);
-    }
-    40% {
-        transform: rotate(1deg);
-    }
-    50% {
-        transform: rotate(0deg);
-    }
-    60% {
-        background-color: #ffebcd;
-    }
-    100% {
-        background-color: rgba(255, 235, 205, 0.7);
-    }
+/* Enhanced egg crack animations */
+@keyframes wobble {
+    0% { transform: rotate(0deg) scale(1); }
+    15% { transform: rotate(-5deg) scale(1.05); }
+    30% { transform: rotate(3deg) scale(1.02); }
+    45% { transform: rotate(-3deg) scale(1.05); }
+    60% { transform: rotate(2deg) scale(1.03); }
+    75% { transform: rotate(-1deg) scale(1.01); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Crack lines that appear during animation */
+.egg::before,
+.egg::after {
+    content: '';
+    position: absolute;
+    background-color: transparent;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.egg::before {
+    width: 2px;
+    height: 40%;
+    top: 20%;
+    left: 40%;
+    transform: rotate(25deg);
+}
+
+.egg::after {
+    width: 2px;
+    height: 50%;
+    top: 25%;
+    right: 35%;
+    transform: rotate(-20deg);
 }
 
 .cracking {
-    animation: crack 0.5s ease-in-out forwards;
+    animation: wobble 0.5s ease-in-out;
+}
+
+.cracking::before,
+.cracking::after {
+    background-color: rgba(70, 40, 0, 0.5);
+    opacity: 1;
 }
 
 .cracked {
-    background-color: rgba(255, 235, 205, 0.7);
+    background-color: rgba(255, 235, 205, 0.8);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cracked::before,
+.cracked::after {
+    background-color: rgba(70, 40, 0, 0.3);
+    opacity: 1;
+}
+
+/* Additional crack line for cracked egg */
+.cracked::before {
+    width: 3px;
 }

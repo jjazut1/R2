@@ -24,19 +24,26 @@ egg.addEventListener('click', function() {
         crackSound.currentTime = 0;
         crackSound.play();
         
-        // Add cracking animation
-        this.classList.add('cracking');
-        
-        // Reveal the item after a short delay
+        // Flash effect before wobble
+        this.style.backgroundColor = '#fff9e6';
         setTimeout(() => {
-            this.textContent = item;
-            this.classList.remove('cracking');
-            this.classList.add('cracked');
+            this.style.backgroundColor = '#ffebcd';
             
-            // Reset selectedItem to ensure it's not automatically selected
-            selectedItem = null;
-            virtualDragPreview.style.display = 'none';
-        }, 400); // Animation timing
+            // Add cracking animation
+            this.classList.add('cracking');
+            
+            // Reveal the item after animation completes
+            setTimeout(() => {
+                this.textContent = item;
+                this.classList.remove('cracking');
+                this.classList.add('cracked');
+                
+                // Reset selectedItem to ensure it's not automatically selected
+                selectedItem = null;
+                virtualDragPreview.style.display = 'none';
+            }, 500); // Match animation duration
+            
+        }, 50); // Short delay for flash effect
     } else {
         // If the egg is already cracked, clicking on it selects the item
         selectedItem = this.textContent;
