@@ -43,6 +43,8 @@ document.addEventListener('mousemove', (event) => {
                 egg.textContent = '?';
                 egg.classList.remove('cracked');
                 selectedItem = null;
+
+                // Hide the ghost tracker after drop
                 virtualDragPreview.style.display = 'none';
             }
         }
