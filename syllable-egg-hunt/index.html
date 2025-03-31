@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <button id="configureGame" class="configure-btn">Configure Game</button>
+
     <div class="container">
         <div class="left-quadrant">
             <div id="game-board">
@@ -27,6 +29,68 @@
             <!-- Right side content will go here -->
         </div>
     </div>
+
+    <div id="configPopup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Configure Game</h2>
+            <form id="gameConfigForm">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="eggQty">Number of Eggs:</label>
+                    <input type="number" id="eggQty" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="basketQty">Number of Baskets:</label>
+                    <input type="number" id="basketQty" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="share">Share Configuration:</label>
+                    <input type="checkbox" id="share">
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoryType">Category Type:</label>
+                    <select id="categoryType" required>
+                        <option value="string">Simple List</option>
+                        <option value="array">Array</option>
+                        <option value="map">Key-Value Map</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category Content:</label>
+                    <textarea id="category" required></textarea>
+                    <small>Format depends on type selected above. See help for details.</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">Save Configuration</button>
+                    <button type="button" id="loadConfig">Load Saved Config</button>
+                    <button type="button" id="closePopup">Close</button>
+                </div>
+            </form>
+
+            <div id="savedConfigs" class="saved-configs">
+                <h3>Saved Configurations</h3>
+                <select id="configSelect">
+                    <option value="">Select a configuration...</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <script src="game.js"></script>
+    <script type="module" src="gameConfig.js"></script>
 </body>
 </html>

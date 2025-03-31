@@ -189,16 +189,3 @@ document.addEventListener('click', (event) => {
     // Show the ghost tracker at the new location
     ghostTracker.style.display = 'block';
 });
-
-// Add these functions to update game elements
-function updateEggs(quantity) {
-    // Implementation to update number of eggs
-}
-
-function updateBaskets(quantity) {
-    // Implementation to update number of baskets
-}
-
-function updateCategories(categories) {
-    // Implementation to update the categories
-}
