@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-// Initialize Firebase (fetch config from your secure endpoint)
-fetch('https://your-api-endpoint/firebase-config')
+// Fetch Firebase configuration from your API endpoint
+fetch('/api/firebase-config')
     .then(response => response.json())
     .then(firebaseConfig => {
         const app = initializeApp(firebaseConfig);
