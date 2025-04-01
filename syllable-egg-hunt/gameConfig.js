@@ -139,53 +139,6 @@ fetch('/api/firebase-config')
                         this.loadConfiguration(e.target.value);
                     }
                 });
-
-                // Category type change handler
-                document.getElementById('categoryType').addEventListener('change', (e) => {
-                    this.updateCategoryHelp(e.target.value);
-                });
-
-                // Add basket quantity change handler with validation
-                const basketQtyInput = document.getElementById('basketQty');
-                if (basketQtyInput) {
-                    basketQtyInput.addEventListener('change', (e) => {
-                        const value = parseInt(e.target.value);
-                        if (value > 0) {
-                            this.updateCategoryFields(value);
-                        } else {
-                            e.target.value = 1; // Reset to minimum value
-                            this.updateCategoryFields(1);
-                        }
-                    });
-                }
-            }
-
-            updateCategoryFields(basketQty) {
-                const categoryContainer = document.getElementById('dynamicCategories');
-                if (!categoryContainer) {
-                    console.error('Dynamic categories container not found');
-                    return;
-                }
-
-                categoryContainer.innerHTML = ''; // Clear existing fields
-
-                // Create fields for each basket
-                for (let i = 0; i < basketQty; i++) {
-                    const categoryGroup = document.createElement('div');
-                    categoryGroup.className = 'category-group';
-                    categoryGroup.innerHTML = `
-                        <div class="form-group">
-                            <label for="categoryName${i}">Category ${i + 1} Name:</label>
-                            <input type="text" id="categoryName${i}" class="category-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="categoryItems${i}">Items for Category ${i + 1}:</label>
-                            <textarea id="categoryItems${i}" class="category-items" required></textarea>
-                            <small>Enter items separated by new lines</small>
-                        </div>
-                    `;
-                    categoryContainer.appendChild(categoryGroup);
-                }
             }
 
             async saveConfiguration() {
@@ -196,7 +149,7 @@ fetch('/api/firebase-config')
 
                 const config = {
                     title: document.getElementById('title').value,
-                    email: auth.currentUser.email, // Use authenticated user's email
+                    email: auth.currentUser.email,
                     eggQty: parseInt(document.getElementById('eggQty').value),
                     basketQty: parseInt(document.getElementById('basketQty').value),
                     share: document.getElementById('share').checked,
@@ -291,15 +244,6 @@ fetch('/api/firebase-config')
                 document.getElementById('eggQty').value = config.eggQty;
                 document.getElementById('basketQty').value = config.basketQty;
                 document.getElementById('share').checked = config.share;
-
-                // Update category fields
-                this.updateCategoryFields(config.basketQty);
-
-                // Fill in category data
-                config.categories.forEach((category, index) => {
-                    document.getElementById(`categoryName${index}`).value = category.name;
-                    document.getElementById(`categoryItems${index}`).value = category.items.join('\n');
-                });
 
                 // Update the game with new configuration
                 this.updateGame(config);
