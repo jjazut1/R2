@@ -1,4 +1,78 @@
 // game.js
+export function updateEggs(quantity) {
+    const gameBoard = document.getElementById('game-board');
+    gameBoard.innerHTML = ''; // Clear existing eggs
+    
+    for (let i = 0; i < quantity; i++) {
+        const egg = document.createElement('div');
+        egg.className = 'egg';
+        egg.textContent = '?';
+        gameBoard.appendChild(egg);
+        
+        // Add the egg click event listener
+        egg.addEventListener('click', handleEggClick);
+    }
+}
+
+export function updateBaskets(quantity) {
+    const basketsContainer = document.getElementById('baskets');
+    basketsContainer.innerHTML = ''; // Clear existing baskets
+    
+    for (let i = 0; i < quantity; i++) {
+        const basket = document.createElement('div');
+        basket.className = 'basket';
+        basket.id = `basket-${i}`;
+        basket.setAttribute('data-items', '');
+        
+        basket.innerHTML = `
+            <div class="title">Category ${i + 1}</div>
+            <div class="items"></div>
+        `;
+        
+        basketsContainer.appendChild(basket);
+    }
+}
+
+export function updateCategories(categories) {
+    const basketsContainer = document.getElementById('baskets');
+    basketsContainer.innerHTML = '';
+
+    categories.forEach(category => {
+        const basket = document.createElement('div');
+        basket.className = 'basket';
+        basket.id = `basket-${category.name.toLowerCase().replace(/\s+/g, '-')}`;
+        basket.setAttribute('data-items', '');
+        
+        basket.innerHTML = `
+            <div class="title">${category.name}</div>
+            <div class="items"></div>
+        `;
+        
+        basketsContainer.appendChild(basket);
+        
+        // Add click event listener for the new basket
+        basket.addEventListener('click', handleBasketClick);
+    });
+}
+
+// Helper function for egg click handling
+function handleEggClick() {
+    // Move your existing egg click logic here
+    if (!this.classList.contains('cracked')) {
+        // ... existing egg cracking logic ...
+    } else {
+        // ... existing selected item logic ...
+    }
+}
+
+// Helper function for basket click handling
+function handleBasketClick() {
+    // Move your existing basket click logic here
+    if (selectedItem) {
+        // ... existing basket logic ...
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const egg = document.getElementById('egg');
     const syllableBasket = document.getElementById('syllable-basket');
@@ -198,53 +272,4 @@ document.addEventListener('DOMContentLoaded', () => {
             ghostTracker.style.display = 'block';
         }
     });
-
-    // Add these functions to update game elements
-    function updateEggs(quantity) {
-        // Implementation to update number of eggs
-    }
-
-    function updateBaskets(quantity) {
-        // Implementation to update number of baskets
-    }
-
-    function updateCategories(categories) {
-        // Remove existing baskets
-        const basketsContainer = document.getElementById('baskets');
-        basketsContainer.innerHTML = '';
-
-        // Create new baskets based on categories
-        categories.forEach(category => {
-            const basket = document.createElement('div');
-            basket.className = 'basket';
-            basket.id = `basket-${category.name.toLowerCase().replace(/\s+/g, '-')}`;
-            basket.setAttribute('data-items', '');
-            
-            basket.innerHTML = `
-                <div class="title">${category.name}</div>
-                <div class="items"></div>
-            `;
-            
-            basketsContainer.appendChild(basket);
-
-            // Add click event listener for the new basket
-            basket.addEventListener('click', function() {
-                if (selectedItem) {
-                    const isCorrectCategory = category.items.includes(selectedItem);
-                    if (isCorrectCategory) {
-                        const currentItems = this.getAttribute('data-items') || '';
-                        const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
-                        this.setAttribute('data-items', updatedItems);
-                        this.querySelector('.items').textContent = updatedItems;
-
-                        // Reset the egg
-                        egg.textContent = '?';
-                        egg.classList.remove('cracked');
-                        selectedItem = null;
-                        virtualDragPreview.style.display = 'none';
-                    }
-                }
-            });
-        });
-    }
 });

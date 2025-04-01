@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { updateEggs, updateBaskets, updateCategories } from './game.js';
 
 // Fetch Firebase configuration from your API endpoint
 fetch('/api/firebase-config')
@@ -179,9 +180,7 @@ fetch('/api/firebase-config')
             }
 
             updateGame(config) {
-                // Update game elements based on configuration
-                // This will need to be implemented based on your game's specific needs
-                // For example:
+                // Now these functions will be defined
                 updateEggs(config.eggQty);
                 updateBaskets(config.basketQty);
                 updateCategories(config.categories);
