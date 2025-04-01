@@ -27,11 +27,31 @@ fetch('/api/firebase-config')
                         document.getElementById('email').disabled = true;
                         this.loadSavedConfigs();
                         this.showAuthStatus(true, user.email);
+                        // Enable configure button
+                        this.setupConfigureButton();
                     } else {
                         // No user is signed in
                         this.showAuthStatus(false);
+                        // Disable configure button or show login prompt
+                        const configureBtn = document.getElementById('configureGame');
+                        configureBtn.onclick = () => {
+                            alert('Please login first to configure the game');
+                            this.login();
+                        };
                     }
                 });
+            }
+
+            setupConfigureButton() {
+                const configureBtn = document.getElementById('configureGame');
+                configureBtn.onclick = () => {
+                    const popup = document.getElementById('configPopup');
+                    if (popup) {
+                        popup.style.display = 'block';
+                    } else {
+                        console.error('Configure popup not found');
+                    }
+                };
             }
 
             showAuthStatus(isLoggedIn, email = '') {
@@ -76,15 +96,32 @@ fetch('/api/firebase-config')
             }
 
             setupEventListeners() {
-                // Open popup
-                document.getElementById('configureGame').addEventListener('click', () => {
-                    document.getElementById('configPopup').style.display = 'block';
-                });
+                // Configure button initial setup
+                const configureBtn = document.getElementById('configureGame');
+                if (configureBtn) {
+                    configureBtn.onclick = () => {
+                        if (!auth.currentUser) {
+                            alert('Please login first to configure the game');
+                            this.login();
+                            return;
+                        }
+                        const popup = document.getElementById('configPopup');
+                        if (popup) {
+                            popup.style.display = 'block';
+                        }
+                    };
+                }
 
-                // Close popup
-                document.getElementById('closePopup').addEventListener('click', () => {
-                    document.getElementById('configPopup').style.display = 'none';
-                });
+                // Close popup button
+                const closeBtn = document.getElementById('closePopup');
+                if (closeBtn) {
+                    closeBtn.onclick = () => {
+                        const popup = document.getElementById('configPopup');
+                        if (popup) {
+                            popup.style.display = 'none';
+                        }
+                    };
+                }
 
                 // Form submission
                 document.getElementById('gameConfigForm').addEventListener('submit', async (e) => {
