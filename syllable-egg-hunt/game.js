@@ -6,11 +6,59 @@ export function updateEggs(quantity) {
     for (let i = 0; i < quantity; i++) {
         const egg = document.createElement('div');
         egg.className = 'egg';
+        egg.id = `egg-${i}`;  // Give each egg a unique ID
         egg.textContent = '?';
         gameBoard.appendChild(egg);
         
-        // Add the egg click event listener
-        egg.addEventListener('click', handleEggClick);
+        // Add the egg click event listener with all original functionality
+        egg.addEventListener('click', function() {
+            // Only crack the egg if it's not already cracked
+            if (!this.classList.contains('cracked')) {
+                const isSyllable = Math.random() < 0.5;
+                const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
+                const item = items[Math.floor(Math.random() * items.length)];
+                
+                // Generate cracks
+                generateCracks(this);
+                
+                // Play cracking sound
+                crackSound.currentTime = 0;
+                crackSound.play();
+                
+                // Flash effect before wobble
+                this.style.backgroundColor = '#fff9e6';
+                setTimeout(() => {
+                    this.style.backgroundColor = '#ffebcd';
+                    
+                    // Add cracking animation
+                    this.classList.add('cracking');
+                    
+                    // Reveal the item after animation completes
+                    setTimeout(() => {
+                        this.textContent = item;
+                        this.classList.remove('cracking');
+                        this.classList.add('cracked');
+                        
+                        // Reset selectedItem to ensure it's not automatically selected
+                        selectedItem = null;
+                        virtualDragPreview.style.display = 'none';
+                    }, 500); // Match animation duration
+                    
+                }, 50); // Short delay for flash effect
+            } else {
+                // If the egg is already cracked, clicking on it selects the item
+                selectedItem = this.textContent;
+                
+                // Show ghost tracker with the selected item
+                virtualDragPreview.textContent = selectedItem;
+                virtualDragPreview.style.display = 'block';
+                
+                // Position the ghost tracker at the click location
+                const rect = this.getBoundingClientRect();
+                virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+                virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+            }
+        });
     }
 }
 
@@ -180,55 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
         element.appendChild(svg);
     }
 
-    egg.addEventListener('click', function() {
-        // Only crack the egg if it's not already cracked
-        if (!this.classList.contains('cracked')) {
-            const isSyllable = Math.random() < 0.5;
-            const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
-            const item = items[Math.floor(Math.random() * items.length)];
-            
-            // Generate cracks
-            generateCracks(this);
-            
-            // Play cracking sound
-            crackSound.currentTime = 0;
-            crackSound.play();
-            
-            // Flash effect before wobble
-            this.style.backgroundColor = '#fff9e6';
-            setTimeout(() => {
-                this.style.backgroundColor = '#ffebcd';
-                
-                // Add cracking animation
-                this.classList.add('cracking');
-                
-                // Reveal the item after animation completes
-                setTimeout(() => {
-                    this.textContent = item;
-                    this.classList.remove('cracking');
-                    this.classList.add('cracked');
-                    
-                    // Reset selectedItem to ensure it's not automatically selected
-                    selectedItem = null;
-                    virtualDragPreview.style.display = 'none';
-                }, 500); // Match animation duration
-                
-            }, 50); // Short delay for flash effect
-        } else {
-            // If the egg is already cracked, clicking on it selects the item
-            selectedItem = this.textContent;
-            
-            // Show ghost tracker with the selected item
-            virtualDragPreview.textContent = selectedItem;
-            virtualDragPreview.style.display = 'block';
-            
-            // Position the ghost tracker at the click location
-            const rect = this.getBoundingClientRect();
-            virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
-            virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
-        }
-    });
-
     document.addEventListener('mousemove', (event) => {
         if (selectedItem) {
             virtualDragPreview.style.left = `${event.clientX}px`;
@@ -272,4 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ghostTracker.style.display = 'block';
         }
     });
+
+    // Export these if needed by other modules
+    export { selectedItem, virtualDragPreview, crackSound, generateCracks };
 });
