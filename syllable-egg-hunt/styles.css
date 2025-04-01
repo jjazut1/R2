@@ -199,3 +199,19 @@ body {
     padding-top: 20px;
     border-top: 1px solid #ccc;
 }
+
+.category-group {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.category-group .form-group {
+    margin-bottom: 10px;
+}
+
+.category-group textarea {
+    min-height: 100px;
+}

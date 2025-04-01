@@ -209,6 +209,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateCategories(categories) {
-        // Implementation to update the categories
+        // Remove existing baskets
+        const basketsContainer = document.getElementById('baskets');
+        basketsContainer.innerHTML = '';
+
+        // Create new baskets based on categories
+        categories.forEach(category => {
+            const basket = document.createElement('div');
+            basket.className = 'basket';
+            basket.id = `basket-${category.name.toLowerCase().replace(/\s+/g, '-')}`;
+            basket.setAttribute('data-items', '');
+            
+            basket.innerHTML = `
+                <div class="title">${category.name}</div>
+                <div class="items"></div>
+            `;
+            
+            basketsContainer.appendChild(basket);
+
+            // Add click event listener for the new basket
+            basket.addEventListener('click', function() {
+                if (selectedItem) {
+                    const isCorrectCategory = category.items.includes(selectedItem);
+                    if (isCorrectCategory) {
+                        const currentItems = this.getAttribute('data-items') || '';
+                        const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
+                        this.setAttribute('data-items', updatedItems);
+                        this.querySelector('.items').textContent = updatedItems;
+
+                        // Reset the egg
+                        egg.textContent = '?';
+                        egg.classList.remove('cracked');
+                        selectedItem = null;
+                        virtualDragPreview.style.display = 'none';
+                    }
+                }
+            });
+        });
     }
 });

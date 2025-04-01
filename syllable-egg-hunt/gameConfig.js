@@ -42,17 +42,64 @@ fetch('/api/firebase-config')
                 document.getElementById('categoryType').addEventListener('change', (e) => {
                     this.updateCategoryHelp(e.target.value);
                 });
+
+                // Add basket quantity change handler
+                document.getElementById('basketQty').addEventListener('change', (e) => {
+                    this.updateCategoryFields(parseInt(e.target.value));
+                });
+            }
+
+            updateCategoryFields(basketQty) {
+                const categoryContainer = document.getElementById('dynamicCategories');
+                if (!categoryContainer) {
+                    // Create container if it doesn't exist
+                    const container = document.createElement('div');
+                    container.id = 'dynamicCategories';
+                    document.getElementById('categoryType').parentElement.after(container);
+                }
+                categoryContainer.innerHTML = ''; // Clear existing fields
+
+                // Create fields for each basket
+                for (let i = 0; i < basketQty; i++) {
+                    const categoryGroup = document.createElement('div');
+                    categoryGroup.className = 'category-group';
+                    categoryGroup.innerHTML = `
+                        <div class="form-group">
+                            <label for="categoryName${i}">Category ${i + 1} Name:</label>
+                            <input type="text" id="categoryName${i}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryItems${i}">Items for Category ${i + 1}:</label>
+                            <textarea id="categoryItems${i}" required></textarea>
+                            <small>Enter items separated by new lines</small>
+                        </div>
+                    `;
+                    categoryContainer.appendChild(categoryGroup);
+                }
             }
 
             async saveConfiguration() {
+                const basketQty = parseInt(document.getElementById('basketQty').value);
+                const categories = [];
+
+                // Collect data from dynamic category fields
+                for (let i = 0; i < basketQty; i++) {
+                    categories.push({
+                        name: document.getElementById(`categoryName${i}`).value,
+                        items: document.getElementById(`categoryItems${i}`).value
+                            .split('\n')
+                            .map(item => item.trim())
+                            .filter(item => item)
+                    });
+                }
+
                 const config = {
                     title: document.getElementById('title').value,
                     email: document.getElementById('email').value,
                     eggQty: parseInt(document.getElementById('eggQty').value),
-                    basketQty: parseInt(document.getElementById('basketQty').value),
+                    basketQty: basketQty,
                     share: document.getElementById('share').checked,
-                    categoryType: document.getElementById('categoryType').value,
-                    category: this.parseCategoryContent(),
+                    categories: categories,
                     createdAt: new Date(),
                 };
 
@@ -63,32 +110,6 @@ fetch('/api/firebase-config')
                 } catch (error) {
                     console.error('Error saving configuration:', error);
                     alert('Error saving configuration');
-                }
-            }
-
-            parseCategoryContent() {
-                const content = document.getElementById('category').value;
-                const type = document.getElementById('categoryType').value;
-
-                try {
-                    switch (type) {
-                        case 'string':
-                            return content;
-                        case 'array':
-                            return content.split('\n').map(item => item.trim()).filter(item => item);
-                        case 'map':
-                            const map = {};
-                            content.split('\n').forEach(line => {
-                                const [key, value] = line.split(':').map(item => item.trim());
-                                if (key && value) map[key] = value;
-                            });
-                            return map;
-                        default:
-                            return content;
-                    }
-                } catch (error) {
-                    console.error('Error parsing category content:', error);
-                    return content;
                 }
             }
 
@@ -135,22 +156,15 @@ fetch('/api/firebase-config')
                 document.getElementById('eggQty').value = config.eggQty;
                 document.getElementById('basketQty').value = config.basketQty;
                 document.getElementById('share').checked = config.share;
-                document.getElementById('categoryType').value = config.categoryType;
-                
-                // Format category content based on type
-                let categoryContent = '';
-                if (typeof config.category === 'object') {
-                    if (Array.isArray(config.category)) {
-                        categoryContent = config.category.join('\n');
-                    } else {
-                        categoryContent = Object.entries(config.category)
-                            .map(([key, value]) => `${key}: ${value}`)
-                            .join('\n');
-                    }
-                } else {
-                    categoryContent = config.category;
-                }
-                document.getElementById('category').value = categoryContent;
+
+                // Update category fields
+                this.updateCategoryFields(config.basketQty);
+
+                // Fill in category data
+                config.categories.forEach((category, index) => {
+                    document.getElementById(`categoryName${index}`).value = category.name;
+                    document.getElementById(`categoryItems${index}`).value = category.items.join('\n');
+                });
 
                 // Update the game with new configuration
                 this.updateGame(config);
@@ -162,7 +176,7 @@ fetch('/api/firebase-config')
                 // For example:
                 updateEggs(config.eggQty);
                 updateBaskets(config.basketQty);
-                updateCategories(config.category);
+                updateCategories(config.categories);
             }
         }
 
