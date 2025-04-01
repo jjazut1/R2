@@ -118,11 +118,13 @@ function updateEggs(quantity) {
 // Update the updateCategories function to store the config
 function updateCategories(categories) {
     currentGameConfig = categories;
-    availableItems.clear(); // Reset available items
+    availableItems.clear();
 
-    // Initialize available items for each category
+    // Initialize available items for each category, splitting by comma
     categories.forEach(category => {
-        availableItems.set(category.name, [...category.items]); // Create copy of items array
+        // Split items by comma and trim whitespace
+        const itemsList = category.items.split(',').map(item => item.trim());
+        availableItems.set(category.name, itemsList);
     });
 
     const basketsContainer = document.getElementById('baskets');
@@ -153,7 +155,8 @@ function getRandomItem() {
     if (availableCategories.length === 0) {
         // All items have been used, reset available items
         currentGameConfig.forEach(category => {
-            availableItems.set(category.name, [...category.items]);
+            const itemsList = category.items.split(',').map(item => item.trim());
+            availableItems.set(category.name, itemsList);
         });
         return getRandomItem(); // Try again with reset items
     }
