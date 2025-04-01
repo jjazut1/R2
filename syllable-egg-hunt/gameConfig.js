@@ -88,29 +88,30 @@ fetch('/api/firebase-config')
             }
 
             async saveConfiguration() {
-                const basketQty = parseInt(document.getElementById('basketQty').value);
-                const categories = [];
-
-                // Collect data from dynamic category fields
-                for (let i = 0; i < basketQty; i++) {
-                    categories.push({
-                        name: document.getElementById(`categoryName${i}`).value,
-                        items: document.getElementById(`categoryItems${i}`).value
-                            .split('\n')
-                            .map(item => item.trim())
-                            .filter(item => item)
-                    });
-                }
-
                 const config = {
                     title: document.getElementById('title').value,
                     email: document.getElementById('email').value,
                     eggQty: parseInt(document.getElementById('eggQty').value),
-                    basketQty: basketQty,
+                    basketQty: parseInt(document.getElementById('basketQty').value),
                     share: document.getElementById('share').checked,
-                    categories: categories,
-                    createdAt: new Date(),
+                    categories: []
                 };
+
+                // Get all category groups
+                const categoryGroups = document.querySelectorAll('.category-group');
+                categoryGroups.forEach((group, index) => {
+                    const categoryName = document.getElementById(`categoryName${index}`).value;
+                    const categoryItems = document.getElementById(`categoryItems${index}`)
+                        .value
+                        .split(',')  // Split by comma
+                        .map(item => item.trim())  // Remove whitespace
+                        .filter(item => item.length > 0);  // Remove empty items
+
+                    config.categories.push({
+                        name: categoryName,
+                        items: categoryItems  // Store as array
+                    });
+                });
 
                 try {
                     await addDoc(collection(db, 'sortCategoriesEgg'), config);
