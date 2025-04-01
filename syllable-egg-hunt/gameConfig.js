@@ -9,12 +9,70 @@ fetch('/api/firebase-config')
     .then(firebaseConfig => {
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);  // Initialize auth
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
         
         class GameConfiguration {
             constructor() {
                 this.setupEventListeners();
+                this.checkAuthState();
                 this.loadSavedConfigs();
+            }
+
+            checkAuthState() {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        // User is signed in
+                        document.getElementById('email').value = user.email;
+                        document.getElementById('email').disabled = true;
+                        this.loadSavedConfigs();
+                        this.showAuthStatus(true, user.email);
+                    } else {
+                        // No user is signed in
+                        this.showAuthStatus(false);
+                    }
+                });
+            }
+
+            showAuthStatus(isLoggedIn, email = '') {
+                // Add this HTML to your page if not already present
+                const authDiv = document.createElement('div');
+                authDiv.id = 'authStatus';
+                authDiv.className = 'auth-status';
+                document.body.appendChild(authDiv);
+
+                if (isLoggedIn) {
+                    authDiv.innerHTML = `
+                        <span>Logged in as: ${email}</span>
+                        <button id="logoutBtn">Logout</button>
+                    `;
+                    document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+                } else {
+                    authDiv.innerHTML = `
+                        <button id="loginBtn">Login with Google</button>
+                    `;
+                    document.getElementById('loginBtn').addEventListener('click', () => this.login());
+                }
+            }
+
+            async login() {
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    console.log('Successfully logged in:', result.user.email);
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('Error logging in. Please try again.');
+                }
+            }
+
+            async logout() {
+                try {
+                    await auth.signOut();
+                    document.getElementById('email').value = '';
+                    document.getElementById('email').disabled = false;
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
             }
 
             setupEventListeners() {
@@ -29,9 +87,13 @@ fetch('/api/firebase-config')
                 });
 
                 // Form submission
-                document.getElementById('gameConfigForm').addEventListener('submit', (e) => {
+                document.getElementById('gameConfigForm').addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    this.saveConfiguration();
+                    if (!auth.currentUser) {
+                        alert('Please login first to save configuration');
+                        return;
+                    }
+                    await this.saveConfiguration();
                 });
 
                 // Load configuration
@@ -90,30 +152,36 @@ fetch('/api/firebase-config')
             }
 
             async saveConfiguration() {
-                const basketQty = parseInt(document.getElementById('basketQty').value);
-                const categories = [];
-
-                // Collect data from dynamic category fields
-                for (let i = 0; i < basketQty; i++) {
-                    categories.push({
-                        name: document.getElementById(`categoryName${i}`).value,
-                        items: document.getElementById(`categoryItems${i}`)
-                            .value
-                            .split(',')
-                            .map(item => item.trim())
-                            .filter(item => item.length > 0)
-                    });
+                if (!auth.currentUser) {
+                    alert('Please login first to save configuration');
+                    return;
                 }
 
                 const config = {
                     title: document.getElementById('title').value,
-                    email: document.getElementById('email').value,
+                    email: auth.currentUser.email, // Use authenticated user's email
                     eggQty: parseInt(document.getElementById('eggQty').value),
-                    basketQty: basketQty,
+                    basketQty: parseInt(document.getElementById('basketQty').value),
                     share: document.getElementById('share').checked,
-                    categories: categories,
+                    categories: [],
                     createdAt: new Date()
                 };
+
+                // Get all category groups
+                const categoryGroups = document.querySelectorAll('.category-group');
+                categoryGroups.forEach((group, index) => {
+                    const categoryName = document.getElementById(`categoryName${index}`).value;
+                    const categoryItems = document.getElementById(`categoryItems${index}`)
+                        .value
+                        .split(',')
+                        .map(item => item.trim())
+                        .filter(item => item.length > 0);
+
+                    config.categories.push({
+                        name: categoryName,
+                        items: categoryItems
+                    });
+                });
 
                 try {
                     await addDoc(collection(db, 'sortCategoriesEgg'), config);
