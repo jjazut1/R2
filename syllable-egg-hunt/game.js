@@ -10,6 +10,9 @@ crackSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/b
 crackSound.id = 'breakSound';
 document.body.appendChild(crackSound);
 
+// Add a variable to store the current game configuration
+let currentGameConfig = null;
+
 function generateCracks(element) {
     // Remove any existing cracks
     const existingCracks = element.querySelectorAll('.crack-line');
@@ -109,34 +112,62 @@ function updateEggs(quantity) {
     }
 }
 
+// Update the updateCategories function to store the config
+function updateCategories(categories) {
+    currentGameConfig = categories;  // Store the categories configuration
+    const basketsContainer = document.getElementById('baskets');
+    basketsContainer.innerHTML = '';
+
+    categories.forEach(category => {
+        const basket = document.createElement('div');
+        basket.className = 'basket';
+        basket.id = `basket-${category.name.toLowerCase().replace(/\s+/g, '-')}`;
+        basket.setAttribute('data-items', '');
+        
+        basket.innerHTML = `
+            <div class="title">${category.name}</div>
+            <div class="items"></div>
+        `;
+        
+        basketsContainer.appendChild(basket);
+        basket.addEventListener('click', handleBasketClick);
+    });
+}
+
+// Modify handleEggClick to use the current configuration
 function handleEggClick() {
     if (!this.classList.contains('cracked')) {
-        const isSyllable = Math.random() < 0.5;
-        const items = isSyllable ? ['ran', 'im', 're', 'yes', 'ape', 'he'] : ['fl', 'ip', 'teb', 'yms', 'stre', 'gld', 'br'];
-        const item = items[Math.floor(Math.random() * items.length)];
-        
-        generateCracks(this);
-        
-        crackSound.currentTime = 0;
-        crackSound.play();
-        
-        this.style.backgroundColor = '#fff9e6';
-        setTimeout(() => {
-            this.style.backgroundColor = '#ffebcd';
-            this.classList.add('cracking');
+        // Get random category and item from current configuration
+        if (currentGameConfig && currentGameConfig.length > 0) {
+            const randomCategory = currentGameConfig[Math.floor(Math.random() * currentGameConfig.length)];
+            const items = randomCategory.items;
+            const item = items[Math.floor(Math.random() * items.length)];
             
+            generateCracks(this);
+            
+            crackSound.currentTime = 0;
+            crackSound.play();
+            
+            this.style.backgroundColor = '#fff9e6';
             setTimeout(() => {
-                this.textContent = item;
-                this.classList.remove('cracking');
-                this.classList.add('cracked');
+                this.style.backgroundColor = '#ffebcd';
+                this.classList.add('cracking');
                 
-                selectedItem = null;
-                virtualDragPreview.style.display = 'none';
-            }, 500);
-            
-        }, 50);
+                setTimeout(() => {
+                    this.textContent = item;
+                    this.classList.remove('cracking');
+                    this.classList.add('cracked');
+                    this.setAttribute('data-category', randomCategory.name); // Store category for validation
+                    
+                    selectedItem = null;
+                    virtualDragPreview.style.display = 'none';
+                }, 500);
+                
+            }, 50);
+        }
     } else {
         selectedItem = this.textContent;
+        selectedItemCategory = this.getAttribute('data-category'); // Get the category for validation
         virtualDragPreview.textContent = selectedItem;
         virtualDragPreview.style.display = 'block';
         
@@ -166,30 +197,13 @@ function updateBaskets(quantity) {
     }
 }
 
-function updateCategories(categories) {
-    const basketsContainer = document.getElementById('baskets');
-    basketsContainer.innerHTML = '';
-
-    categories.forEach(category => {
-        const basket = document.createElement('div');
-        basket.className = 'basket';
-        basket.id = `basket-${category.name.toLowerCase().replace(/\s+/g, '-')}`;
-        basket.setAttribute('data-items', '');
-        
-        basket.innerHTML = `
-            <div class="title">${category.name}</div>
-            <div class="items"></div>
-        `;
-        
-        basketsContainer.appendChild(basket);
-        basket.addEventListener('click', handleBasketClick);
-    });
-}
-
+// Update handleBasketClick to use the current configuration
 function handleBasketClick() {
     if (selectedItem) {
-        const isSyllable = ['ran', 'im', 're', 'yes', 'ape', 'he'].includes(selectedItem);
-        if ((isSyllable && this.id === 'syllable-basket') || (!isSyllable && this.id === 'non-syllable-basket')) {
+        const basketCategory = this.querySelector('.title').textContent;
+        const isCorrectCategory = selectedItemCategory === basketCategory;
+        
+        if (isCorrectCategory) {
             const currentItems = this.getAttribute('data-items') || '';
             const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
             this.setAttribute('data-items', updatedItems);
@@ -201,14 +215,19 @@ function handleBasketClick() {
                 if (egg.textContent === selectedItem) {
                     egg.textContent = '?';
                     egg.classList.remove('cracked');
+                    egg.removeAttribute('data-category');
                 }
             });
             
             selectedItem = null;
+            selectedItemCategory = null;
             virtualDragPreview.style.display = 'none';
         }
     }
 }
+
+// Add variable to track selected item's category
+let selectedItemCategory = null;
 
 // Initialize mouse move handler
 document.addEventListener('mousemove', (event) => {
@@ -218,5 +237,5 @@ document.addEventListener('mousemove', (event) => {
     }
 });
 
-// Export the functions needed by other modules
+// Export the necessary functions and variables
 export { updateEggs, updateBaskets, updateCategories };
