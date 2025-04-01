@@ -120,10 +120,19 @@ function updateCategories(categories) {
     currentGameConfig = categories;
     availableItems.clear();
 
-    // Initialize available items for each category, splitting by comma
+    // Initialize available items for each category
     categories.forEach(category => {
-        // Split items by comma and trim whitespace
-        const itemsList = category.items.split(',').map(item => item.trim());
+        let itemsList;
+        if (typeof category.items === 'string') {
+            // If items is a string, split by comma
+            itemsList = category.items.split(',').map(item => item.trim());
+        } else if (Array.isArray(category.items)) {
+            // If items is already an array, use it directly
+            itemsList = [...category.items]; // Create a copy of the array
+        } else {
+            console.error('Invalid category items format:', category);
+            itemsList = [];
+        }
         availableItems.set(category.name, itemsList);
     });
 
@@ -148,28 +157,31 @@ function updateCategories(categories) {
 
 // Helper function to get random item from a category
 function getRandomItem() {
-    // Get categories that still have available items
     const availableCategories = Array.from(availableItems.entries())
         .filter(([_, items]) => items.length > 0);
 
     if (availableCategories.length === 0) {
         // All items have been used, reset available items
         currentGameConfig.forEach(category => {
-            const itemsList = category.items.split(',').map(item => item.trim());
+            let itemsList;
+            if (typeof category.items === 'string') {
+                itemsList = category.items.split(',').map(item => item.trim());
+            } else if (Array.isArray(category.items)) {
+                itemsList = [...category.items];
+            } else {
+                itemsList = [];
+            }
             availableItems.set(category.name, itemsList);
         });
-        return getRandomItem(); // Try again with reset items
+        return getRandomItem();
     }
 
-    // Select random category from those with available items
     const randomCategoryIndex = Math.floor(Math.random() * availableCategories.length);
     const [categoryName, categoryItems] = availableCategories[randomCategoryIndex];
 
-    // Get random item from category and remove it from available items
     const randomItemIndex = Math.floor(Math.random() * categoryItems.length);
     const selectedItem = categoryItems[randomItemIndex];
     
-    // Remove the selected item from available items
     categoryItems.splice(randomItemIndex, 1);
 
     return {
