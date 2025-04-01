@@ -215,3 +215,38 @@ body {
 .category-group textarea {
     min-height: 100px;
 }
+
+.dynamic-categories {
+    margin: 20px 0;
+}
+
+.category-group {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.category-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.category-items {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.category-group small {
+    display: block;
+    color: #666;
+    margin-top: 5px;
+}

@@ -43,20 +43,28 @@ fetch('/api/firebase-config')
                     this.updateCategoryHelp(e.target.value);
                 });
 
-                // Add basket quantity change handler
-                document.getElementById('basketQty').addEventListener('change', (e) => {
-                    this.updateCategoryFields(parseInt(e.target.value));
-                });
+                // Add basket quantity change handler with validation
+                const basketQtyInput = document.getElementById('basketQty');
+                if (basketQtyInput) {
+                    basketQtyInput.addEventListener('change', (e) => {
+                        const value = parseInt(e.target.value);
+                        if (value > 0) {
+                            this.updateCategoryFields(value);
+                        } else {
+                            e.target.value = 1; // Reset to minimum value
+                            this.updateCategoryFields(1);
+                        }
+                    });
+                }
             }
 
             updateCategoryFields(basketQty) {
                 const categoryContainer = document.getElementById('dynamicCategories');
                 if (!categoryContainer) {
-                    // Create container if it doesn't exist
-                    const container = document.createElement('div');
-                    container.id = 'dynamicCategories';
-                    document.getElementById('categoryType').parentElement.after(container);
+                    console.error('Dynamic categories container not found');
+                    return;
                 }
+
                 categoryContainer.innerHTML = ''; // Clear existing fields
 
                 // Create fields for each basket
@@ -66,11 +74,11 @@ fetch('/api/firebase-config')
                     categoryGroup.innerHTML = `
                         <div class="form-group">
                             <label for="categoryName${i}">Category ${i + 1} Name:</label>
-                            <input type="text" id="categoryName${i}" required>
+                            <input type="text" id="categoryName${i}" class="category-input" required>
                         </div>
                         <div class="form-group">
                             <label for="categoryItems${i}">Items for Category ${i + 1}:</label>
-                            <textarea id="categoryItems${i}" required></textarea>
+                            <textarea id="categoryItems${i}" class="category-items" required></textarea>
                             <small>Enter items separated by new lines</small>
                         </div>
                     `;
