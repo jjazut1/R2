@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { updateEggs, updateBaskets, updateCategories } from './game.js';
-import { auth } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 // Fetch Firebase configuration from your API endpoint
 fetch('/api/firebase-config')
@@ -9,6 +9,7 @@ fetch('/api/firebase-config')
     .then(firebaseConfig => {
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);  // Initialize auth
         
         class GameConfiguration {
             constructor() {
@@ -161,7 +162,7 @@ fetch('/api/firebase-config')
                             const newConfig = {
                                 ...data,
                                 title: `Copy of ${data.title}`,
-                                email: auth.currentUser.email,
+                                email: auth.currentUser?.email || '',
                                 createdAt: new Date()
                             };
 
