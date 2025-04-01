@@ -188,10 +188,24 @@ body {
     margin-top: 20px;
 }
 
+.auth-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .configure-btn {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 60px;  /* Moved down below the auth status */
+    right: 10px;
     z-index: 1000;
     padding: 10px 20px;
     background-color: #4CAF50;
@@ -202,8 +216,29 @@ body {
     font-size: 16px;
 }
 
+/* Optional: Add some hover effects */
 .configure-btn:hover {
     background-color: #45a049;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.auth-status button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.auth-status button:hover {
+    background-color: #45a049;
+}
+
+/* Add a container for the email display */
+.auth-status span {
+    font-size: 14px;
+    color: #333;
 }
 
 .saved-configs {
@@ -261,29 +296,4 @@ body {
     display: block;
     color: #666;
     margin-top: 5px;
-}
-
-.auth-status {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 1000;
-}
-
-.auth-status button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-}
-
-.auth-status button:hover {
-    background-color: #45a049;
 }
