@@ -13,6 +13,9 @@ document.body.appendChild(crackSound);
 // Add a variable to store the current game configuration
 let currentGameConfig = null;
 
+// Add variables to track available items for each category
+let availableItems = new Map(); // Will store arrays of unused items for each category
+
 function generateCracks(element) {
     // Remove any existing cracks
     const existingCracks = element.querySelectorAll('.crack-line');
@@ -114,7 +117,14 @@ function updateEggs(quantity) {
 
 // Update the updateCategories function to store the config
 function updateCategories(categories) {
-    currentGameConfig = categories;  // Store the categories configuration
+    currentGameConfig = categories;
+    availableItems.clear(); // Reset available items
+
+    // Initialize available items for each category
+    categories.forEach(category => {
+        availableItems.set(category.name, [...category.items]); // Create copy of items array
+    });
+
     const basketsContainer = document.getElementById('baskets');
     basketsContainer.innerHTML = '';
 
@@ -134,14 +144,42 @@ function updateCategories(categories) {
     });
 }
 
-// Modify handleEggClick to use the current configuration
+// Helper function to get random item from a category
+function getRandomItem() {
+    // Get categories that still have available items
+    const availableCategories = Array.from(availableItems.entries())
+        .filter(([_, items]) => items.length > 0);
+
+    if (availableCategories.length === 0) {
+        // All items have been used, reset available items
+        currentGameConfig.forEach(category => {
+            availableItems.set(category.name, [...category.items]);
+        });
+        return getRandomItem(); // Try again with reset items
+    }
+
+    // Select random category from those with available items
+    const randomCategoryIndex = Math.floor(Math.random() * availableCategories.length);
+    const [categoryName, categoryItems] = availableCategories[randomCategoryIndex];
+
+    // Get random item from category and remove it from available items
+    const randomItemIndex = Math.floor(Math.random() * categoryItems.length);
+    const selectedItem = categoryItems[randomItemIndex];
+    
+    // Remove the selected item from available items
+    categoryItems.splice(randomItemIndex, 1);
+
+    return {
+        category: categoryName,
+        item: selectedItem
+    };
+}
+
+// Modify handleEggClick to use the new random item selection
 function handleEggClick() {
     if (!this.classList.contains('cracked')) {
-        // Get random category and item from current configuration
         if (currentGameConfig && currentGameConfig.length > 0) {
-            const randomCategory = currentGameConfig[Math.floor(Math.random() * currentGameConfig.length)];
-            const items = randomCategory.items;
-            const item = items[Math.floor(Math.random() * items.length)];
+            const randomSelection = getRandomItem();
             
             generateCracks(this);
             
@@ -154,10 +192,10 @@ function handleEggClick() {
                 this.classList.add('cracking');
                 
                 setTimeout(() => {
-                    this.textContent = item;
+                    this.textContent = randomSelection.item;
                     this.classList.remove('cracking');
                     this.classList.add('cracked');
-                    this.setAttribute('data-category', randomCategory.name); // Store category for validation
+                    this.setAttribute('data-category', randomSelection.category);
                     
                     selectedItem = null;
                     virtualDragPreview.style.display = 'none';
@@ -167,7 +205,7 @@ function handleEggClick() {
         }
     } else {
         selectedItem = this.textContent;
-        selectedItemCategory = this.getAttribute('data-category'); // Get the category for validation
+        selectedItemCategory = this.getAttribute('data-category');
         virtualDragPreview.textContent = selectedItem;
         virtualDragPreview.style.display = 'block';
         
