@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { updateEggs, updateBaskets, updateCategories } from './game.js';
+import { auth } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 // Fetch Firebase configuration from your API endpoint
 fetch('/api/firebase-config')
@@ -88,30 +89,30 @@ fetch('/api/firebase-config')
             }
 
             async saveConfiguration() {
+                const basketQty = parseInt(document.getElementById('basketQty').value);
+                const categories = [];
+
+                // Collect data from dynamic category fields
+                for (let i = 0; i < basketQty; i++) {
+                    categories.push({
+                        name: document.getElementById(`categoryName${i}`).value,
+                        items: document.getElementById(`categoryItems${i}`)
+                            .value
+                            .split(',')
+                            .map(item => item.trim())
+                            .filter(item => item.length > 0)
+                    });
+                }
+
                 const config = {
                     title: document.getElementById('title').value,
                     email: document.getElementById('email').value,
                     eggQty: parseInt(document.getElementById('eggQty').value),
-                    basketQty: parseInt(document.getElementById('basketQty').value),
+                    basketQty: basketQty,
                     share: document.getElementById('share').checked,
-                    categories: []
+                    categories: categories,
+                    createdAt: new Date()
                 };
-
-                // Get all category groups
-                const categoryGroups = document.querySelectorAll('.category-group');
-                categoryGroups.forEach((group, index) => {
-                    const categoryName = document.getElementById(`categoryName${index}`).value;
-                    const categoryItems = document.getElementById(`categoryItems${index}`)
-                        .value
-                        .split(',')  // Split by comma
-                        .map(item => item.trim())  // Remove whitespace
-                        .filter(item => item.length > 0);  // Remove empty items
-
-                    config.categories.push({
-                        name: categoryName,
-                        items: categoryItems  // Store as array
-                    });
-                });
 
                 try {
                     await addDoc(collection(db, 'sortCategoriesEgg'), config);
@@ -153,7 +154,25 @@ fetch('/api/firebase-config')
 
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        this.applyConfiguration(data);
+                        
+                        // If this is a shared configuration and not owned by current user
+                        if (data.share && data.email !== auth.currentUser?.email) {
+                            // Create a new configuration based on the shared one
+                            const newConfig = {
+                                ...data,
+                                title: `Copy of ${data.title}`,
+                                email: auth.currentUser.email,
+                                createdAt: new Date()
+                            };
+
+                            // Save as a new configuration
+                            const docRef = await addDoc(collection(db, 'sortCategoriesEgg'), newConfig);
+                            alert('Created a copy of the shared configuration');
+                            return docRef.id;
+                        } else {
+                            // Regular load of own configuration
+                            this.applyConfiguration(data);
+                        }
                     }
                 } catch (error) {
                     console.error('Error loading configuration:', error);
