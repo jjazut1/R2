@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div id="configPopup" class="popup-overlay">
+    <div id="configPopup" class="popup-overlay" style="display: none;">
         <div class="popup-content">
             <h2>Configure Game</h2>
             <form id="gameConfigForm">
@@ -55,13 +55,29 @@
                     <input type="number" id="basketQty" min="1" required>
                 </div>
                 
+                <div id="dynamicCategories" class="dynamic-categories">
+                    <!-- Dynamic category fields will be inserted here -->
+                </div>
+                
                 <div class="form-group">
                     <label for="share">Share Configuration:</label>
                     <input type="checkbox" id="share">
                 </div>
-
-                <!-- Dynamic categories will be added here -->
-                <div id="dynamicCategories"></div>
+                
+                <div class="form-group">
+                    <label for="categoryType">Category Type:</label>
+                    <select id="categoryType" required>
+                        <option value="string">Simple List</option>
+                        <option value="array">Array</option>
+                        <option value="map">Key-Value Map</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category Content:</label>
+                    <textarea id="category" required></textarea>
+                    <small>Format depends on type selected above. See help for details.</small>
+                </div>
 
                 <div class="form-actions">
                     <button type="submit">Save Configuration</button>
