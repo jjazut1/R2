@@ -16,6 +16,10 @@ let currentGameConfig = null;
 // Add variables to track available items for each category
 let availableItems = new Map(); // Will store arrays of unused items for each category
 
+// Add game state tracking
+let totalEggs = 0;
+let crackedEggs = 0;
+
 function generateCracks(element) {
     // Remove any existing cracks
     const existingCracks = element.querySelectorAll('.crack-line');
@@ -101,8 +105,10 @@ function generateCracks(element) {
 
 // Create the game update functions
 function updateEggs(quantity) {
+    totalEggs = quantity;
+    crackedEggs = 0;
     const gameBoard = document.getElementById('game-board');
-    gameBoard.innerHTML = ''; // Clear existing eggs
+    gameBoard.innerHTML = '';
     
     for (let i = 0; i < quantity; i++) {
         const egg = document.createElement('div');
@@ -113,6 +119,13 @@ function updateEggs(quantity) {
         
         egg.addEventListener('click', handleEggClick);
     }
+
+    // Add game status display
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'gameStatus';
+    statusDiv.className = 'game-status';
+    gameBoard.appendChild(statusDiv);
+    updateGameStatus();
 }
 
 // Update the updateCategories function to store the config
@@ -212,6 +225,9 @@ function handleEggClick() {
                     this.classList.add('cracked');
                     this.setAttribute('data-category', randomSelection.category);
                     
+                    crackedEggs++;
+                    updateGameStatus();
+                    
                     selectedItem = null;
                     virtualDragPreview.style.display = 'none';
                 }, 500);
@@ -219,14 +235,17 @@ function handleEggClick() {
             }, 50);
         }
     } else {
-        selectedItem = this.textContent;
-        selectedItemCategory = this.getAttribute('data-category');
-        virtualDragPreview.textContent = selectedItem;
-        virtualDragPreview.style.display = 'block';
-        
-        const rect = this.getBoundingClientRect();
-        virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
-        virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+        // Only allow selecting if game is not complete
+        if (crackedEggs < totalEggs) {
+            selectedItem = this.textContent;
+            selectedItemCategory = this.getAttribute('data-category');
+            virtualDragPreview.textContent = selectedItem;
+            virtualDragPreview.style.display = 'block';
+            
+            const rect = this.getBoundingClientRect();
+            virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+            virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+        }
     }
 }
 
@@ -289,6 +308,53 @@ document.addEventListener('mousemove', (event) => {
         virtualDragPreview.style.top = `${event.clientY}px`;
     }
 });
+
+function updateGameStatus() {
+    const statusDiv = document.getElementById('gameStatus');
+    if (statusDiv) {
+        statusDiv.textContent = `Eggs Cracked: ${crackedEggs}/${totalEggs}`;
+        
+        if (crackedEggs === totalEggs) {
+            showGameComplete();
+        }
+    }
+}
+
+function showGameComplete() {
+    // Create completion overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'game-complete-overlay';
+    overlay.innerHTML = `
+        <div class="game-complete-message">
+            <h2>Game Complete!</h2>
+            <p>All eggs have been cracked.</p>
+            <button id="playAgain">Play Again</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Add play again functionality
+    document.getElementById('playAgain').addEventListener('click', () => {
+        overlay.remove();
+        resetGame();
+    });
+}
+
+function resetGame() {
+    // Reset game state
+    crackedEggs = 0;
+    selectedItem = null;
+    virtualDragPreview.style.display = 'none';
+    
+    // Clear baskets
+    document.querySelectorAll('.basket').forEach(basket => {
+        basket.setAttribute('data-items', '');
+        basket.querySelector('.items').textContent = '';
+    });
+    
+    // Reinitialize eggs
+    updateEggs(totalEggs);
+}
 
 // Export the necessary functions and variables
 export { updateEggs, updateBaskets, updateCategories };
