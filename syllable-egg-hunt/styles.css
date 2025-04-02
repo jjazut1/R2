@@ -345,3 +345,13 @@ body {
 .game-complete-message button:hover {
     background-color: #45a049;
 }
+
+.egg.cracked {
+    cursor: not-allowed;
+    opacity: 0.8;
+    pointer-events: none; /* Prevents any interaction with cracked eggs */
+}
+
+.virtual-drag-preview {
+    pointer-events: none; /* Ensures the preview doesn't interfere with clicks */
+}
