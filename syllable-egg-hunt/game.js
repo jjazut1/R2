@@ -215,33 +215,38 @@ function handleEggClick() {
             crackSound.currentTime = 0;
             crackSound.play();
             
+            // Store the egg element for reference in setTimeout
+            const eggElement = this;
+            
             this.style.backgroundColor = '#fff9e6';
             setTimeout(() => {
-                this.style.backgroundColor = '#ffebcd';
-                this.classList.add('cracking');
+                eggElement.style.backgroundColor = '#ffebcd';
+                eggElement.classList.add('cracking');
                 
                 setTimeout(() => {
-                    this.textContent = randomSelection.item;
-                    this.classList.remove('cracking');
-                    this.classList.add('cracked');
-                    this.setAttribute('data-category', randomSelection.category);
+                    // Reveal the item and mark as cracked
+                    eggElement.textContent = randomSelection.item;
+                    eggElement.classList.remove('cracking');
+                    eggElement.classList.add('cracked');
+                    eggElement.setAttribute('data-category', randomSelection.category);
                     
-                    // Automatically select the item when egg cracks
+                    // Set the selected item for basket placement
                     selectedItem = randomSelection.item;
                     selectedItemCategory = randomSelection.category;
+                    
+                    // Show and position the virtual drag preview
                     virtualDragPreview.textContent = selectedItem;
                     virtualDragPreview.style.display = 'block';
                     
-                    // Position the ghost tracker at the cracked egg
-                    const rect = this.getBoundingClientRect();
+                    const rect = eggElement.getBoundingClientRect();
                     virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
                     virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
                     
                     crackedEggs++;
                     updateGameStatus();
-                }, 500);
+                }, 500); // Match animation duration
                 
-            }, 50);
+            }, 50); // Short delay for flash effect
         }
     }
 }
@@ -278,16 +283,7 @@ function handleBasketClick() {
             this.setAttribute('data-items', updatedItems);
             this.querySelector('.items').textContent = updatedItems;
 
-            // Reset the egg
-            const eggs = document.querySelectorAll('.egg.cracked');
-            eggs.forEach(egg => {
-                if (egg.textContent === selectedItem) {
-                    egg.textContent = '?';
-                    egg.classList.remove('cracked');
-                    egg.removeAttribute('data-category');
-                }
-            });
-            
+            // Only clear the selection and preview, don't reset the egg
             selectedItem = null;
             selectedItemCategory = null;
             virtualDragPreview.style.display = 'none';
@@ -341,6 +337,7 @@ function resetGame() {
     // Reset game state
     crackedEggs = 0;
     selectedItem = null;
+    selectedItemCategory = null;
     virtualDragPreview.style.display = 'none';
     
     // Clear baskets
