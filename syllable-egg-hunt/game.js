@@ -11,11 +11,11 @@ crackSound.id = 'breakSound';
 
 // Add new sound effects
 const correctSound = document.createElement('audio');
-correctSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/correct.mp3'; // Replace with your correct sound URL
+correctSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/short-success-sound-glockenspiel-treasure-video-game-6346 (1).mp3'; // Replace with your correct sound URL
 correctSound.id = 'correctSound';
 
 const incorrectSound = document.createElement('audio');
-incorrectSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/incorrect.mp3'; // Replace with your incorrect sound URL
+incorrectSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/failure-drum-sound-effect-2-7184.mp3'; // Replace with your incorrect sound URL
 incorrectSound.id = 'incorrectSound';
 
 // Add them to the document
