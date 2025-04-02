@@ -8,7 +8,20 @@ document.body.appendChild(virtualDragPreview);
 const crackSound = document.createElement('audio');
 crackSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/break.mp3';
 crackSound.id = 'breakSound';
+
+// Add new sound effects
+const correctSound = document.createElement('audio');
+correctSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/correct.mp3'; // Replace with your correct sound URL
+correctSound.id = 'correctSound';
+
+const incorrectSound = document.createElement('audio');
+incorrectSound.src = 'https://github.com/jjazut1/sound-hosting/raw/refs/heads/main/incorrect.mp3'; // Replace with your incorrect sound URL
+incorrectSound.id = 'incorrectSound';
+
+// Add them to the document
 document.body.appendChild(crackSound);
+document.body.appendChild(correctSound);
+document.body.appendChild(incorrectSound);
 
 // Add a variable to store the current game configuration
 let currentGameConfig = null;
@@ -19,6 +32,9 @@ let availableItems = new Map(); // Will store arrays of unused items for each ca
 // Add game state tracking
 let totalEggs = 0;
 let crackedEggs = 0;
+
+// Add a variable to track placed items
+let placedItems = 0;
 
 function generateCracks(element) {
     // Remove any existing cracks
@@ -244,7 +260,7 @@ function handleEggClick() {
                     
                     crackedEggs++;
                     updateGameStatus();
-                }, 500); // Match animation duration
+                }, 500);
                 
             }, 50); // Short delay for flash effect
         }
@@ -271,22 +287,40 @@ function updateBaskets(quantity) {
     }
 }
 
-// Update handleBasketClick to use the current configuration
+// Modify handleBasketClick to include sounds and check for game completion
 function handleBasketClick() {
     if (selectedItem) {
         const basketCategory = this.querySelector('.title').textContent;
         const isCorrectCategory = selectedItemCategory === basketCategory;
         
         if (isCorrectCategory) {
+            // Play correct sound
+            correctSound.currentTime = 0;
+            correctSound.play();
+
             const currentItems = this.getAttribute('data-items') || '';
             const updatedItems = currentItems ? `${currentItems}, ${selectedItem}` : selectedItem;
             this.setAttribute('data-items', updatedItems);
             this.querySelector('.items').textContent = updatedItems;
 
-            // Only clear the selection and preview, don't reset the egg
+            // Increment placed items counter
+            placedItems++;
+
+            // Clear selection and preview
             selectedItem = null;
             selectedItemCategory = null;
             virtualDragPreview.style.display = 'none';
+
+            // Check for game completion after successful placement
+            if (placedItems === totalEggs) {
+                setTimeout(() => {
+                    showGameComplete();
+                }, 500); // Small delay to allow sound to play
+            }
+        } else {
+            // Play incorrect sound
+            incorrectSound.currentTime = 0;
+            incorrectSound.play();
         }
     }
 }
@@ -302,14 +336,11 @@ document.addEventListener('mousemove', (event) => {
     }
 });
 
+// Modify updateGameStatus to remove automatic game completion check
 function updateGameStatus() {
     const statusDiv = document.getElementById('gameStatus');
     if (statusDiv) {
         statusDiv.textContent = `Eggs Cracked: ${crackedEggs}/${totalEggs}`;
-        
-        if (crackedEggs === totalEggs) {
-            showGameComplete();
-        }
     }
 }
 
@@ -333,9 +364,10 @@ function showGameComplete() {
     });
 }
 
+// Update resetGame to reset the placed items counter
 function resetGame() {
-    // Reset game state
     crackedEggs = 0;
+    placedItems = 0; // Reset placed items counter
     selectedItem = null;
     selectedItemCategory = null;
     virtualDragPreview.style.display = 'none';
