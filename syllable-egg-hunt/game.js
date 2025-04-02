@@ -205,6 +205,7 @@ function getRandomItem() {
 
 // Modify handleEggClick to use the new random item selection
 function handleEggClick() {
+    // Only allow interaction if egg is not cracked
     if (!this.classList.contains('cracked')) {
         if (currentGameConfig && currentGameConfig.length > 0) {
             const randomSelection = getRandomItem();
@@ -225,26 +226,22 @@ function handleEggClick() {
                     this.classList.add('cracked');
                     this.setAttribute('data-category', randomSelection.category);
                     
+                    // Automatically select the item when egg cracks
+                    selectedItem = randomSelection.item;
+                    selectedItemCategory = randomSelection.category;
+                    virtualDragPreview.textContent = selectedItem;
+                    virtualDragPreview.style.display = 'block';
+                    
+                    // Position the ghost tracker at the cracked egg
+                    const rect = this.getBoundingClientRect();
+                    virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
+                    virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
+                    
                     crackedEggs++;
                     updateGameStatus();
-                    
-                    selectedItem = null;
-                    virtualDragPreview.style.display = 'none';
                 }, 500);
                 
             }, 50);
-        }
-    } else {
-        // Only allow selecting if game is not complete
-        if (crackedEggs < totalEggs) {
-            selectedItem = this.textContent;
-            selectedItemCategory = this.getAttribute('data-category');
-            virtualDragPreview.textContent = selectedItem;
-            virtualDragPreview.style.display = 'block';
-            
-            const rect = this.getBoundingClientRect();
-            virtualDragPreview.style.left = `${rect.left + rect.width/2}px`;
-            virtualDragPreview.style.top = `${rect.top + rect.height/2}px`;
         }
     }
 }
