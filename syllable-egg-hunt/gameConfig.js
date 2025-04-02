@@ -140,11 +140,6 @@ fetch('/api/firebase-config')
                     }
                 });
 
-                // Category type change handler
-                document.getElementById('categoryType').addEventListener('change', (e) => {
-                    this.updateCategoryHelp(e.target.value);
-                });
-
                 // Add basket quantity change handler with validation
                 const basketQtyInput = document.getElementById('basketQty');
                 if (basketQtyInput) {
@@ -162,11 +157,6 @@ fetch('/api/firebase-config')
 
             updateCategoryFields(basketQty) {
                 const categoryContainer = document.getElementById('dynamicCategories');
-                if (!categoryContainer) {
-                    console.error('Dynamic categories container not found');
-                    return;
-                }
-
                 categoryContainer.innerHTML = ''; // Clear existing fields
 
                 // Create fields for each basket
@@ -176,12 +166,13 @@ fetch('/api/firebase-config')
                     categoryGroup.innerHTML = `
                         <div class="form-group">
                             <label for="categoryName${i}">Category ${i + 1} Name:</label>
-                            <input type="text" id="categoryName${i}" class="category-input" required>
+                            <input type="text" id="categoryName${i}" required>
                         </div>
                         <div class="form-group">
                             <label for="categoryItems${i}">Items for Category ${i + 1}:</label>
-                            <textarea id="categoryItems${i}" class="category-items" required></textarea>
-                            <small>Enter items separated by new lines</small>
+                            <textarea id="categoryItems${i}" required 
+                                placeholder="Enter items separated by commas"></textarea>
+                            <small>Enter items separated by commas (e.g., item1, item2, item3)</small>
                         </div>
                     `;
                     categoryContainer.appendChild(categoryGroup);
@@ -196,7 +187,7 @@ fetch('/api/firebase-config')
 
                 const config = {
                     title: document.getElementById('title').value,
-                    email: auth.currentUser.email, // Use authenticated user's email
+                    email: auth.currentUser.email,
                     eggQty: parseInt(document.getElementById('eggQty').value),
                     basketQty: parseInt(document.getElementById('basketQty').value),
                     share: document.getElementById('share').checked,
