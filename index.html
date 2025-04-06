@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webpage Template</title>
+    <title>Syllable Egg Hunt</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,6 +43,10 @@
             bottom: 0;
         }
     </style>
+    <!-- Add Firebase Scripts -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js"></script>
 </head>
 <body>
     <header>
@@ -84,6 +89,7 @@
         <p>&copy; 2023 My Website</p>
     </footer>
 
-    <script type="module" src="app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
